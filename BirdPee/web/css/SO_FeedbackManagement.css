@@ -1,0 +1,562 @@
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  outline: none;
+}
+
+body {
+  height: 100vh;
+  width: 100%;
+  background: #f5f5f5;
+}
+
+li {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+nav {
+  height: 90px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background-color: #76a463;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+  justify-content: space-between;
+  position: sticky;
+  z-index: 111111;
+  top: 0;
+  color: black;
+}
+nav .logo {
+  display: flex;
+  align-items: center;
+  margin: 0 24px;
+}
+
+nav .user-info {
+  float: right;
+  padding-right: 80px;
+  text-align: center;
+}
+
+nav .user-info img {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
+
+nav .choose-list {
+  float: right;
+  position: absolute;
+  top: 25px;
+  right: 100px;
+}
+
+nav .choose-list .choose-nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+nav .choose-list .choose-nav li {
+  list-style: none;
+  padding-left: 30px;
+}
+
+nav .choose-list .choose-nav a {
+  text-decoration: none;
+  color: black;
+}
+nav .choose-list .choose-nav li:hover a {
+  color: #088178;
+}
+
+.logo .menu-icon {
+  color: black;
+  font-size: 24px;
+  margin-right: 14px;
+  cursor: pointer;
+}
+.logo .logo-name {
+  color: black;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+span.logo-name {
+  color: black;
+}
+
+nav .sidebar {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  height: 100%;
+  width: 280px;
+  padding: 20px 0;
+  background-color: #f5f5f5;
+  box-shadow: 0 5px 1px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+  z-index: 1000;
+  width: 300px;
+  color: black;
+}
+nav.open .sidebar {
+  left: 0;
+}
+.sidebar .sidebar-content {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 30px 10px;
+}
+.sidebar-content .list {
+  list-style: none;
+}
+.list .nav-link {
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+  padding: 14px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+.lists .nav-link:hover {
+  background-color: #76a463;
+}
+.nav-link .icon {
+  margin-right: 14px;
+  font-size: 20px;
+  color: black;
+}
+.nav-link .link {
+  font-size: 16px;
+  color: black;
+  font-weight: 400;
+}
+.lists .nav-link:hover .icon,
+.lists .nav-link:hover .link {
+  color: black;
+}
+.lists .active {
+  background-color: #76a463;
+  color: black;
+}
+
+.lists .active .icon,
+.lists .active .link {
+  color: black;
+}
+main {
+  width: 100%;
+}
+
+main .main-container {
+  width: 85%;
+  color: #6c7293;
+  background-color: white;
+  margin: 30px auto;
+  box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.5);
+}
+
+main .main-container .title {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  color: black;
+  padding: 30px 20px;
+  align-items: center;
+
+  margin-bottom: 30px;
+}
+
+main .main-container .title .rate .score {
+  font-size: 40px;
+  color: green;
+}
+
+main .main-container .title .rate .total {
+  font-size: 23px;
+  color: #6c7293;
+  margin-left: 3px;
+}
+
+main main .main-container .filter {
+  width: 100%;
+}
+
+main .main-container .filter .input-place {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  color: black;
+  padding: 0 20px;
+}
+
+main .main-container .filter .input-place span {
+  margin-right: 5px;
+}
+
+main .main-container .filter .input-place div input {
+  outline: none;
+  height: 30px;
+  padding: 10px;
+  color: black;
+  border: 2px solid #6c7293;
+}
+
+main .main-container .filter .input-place div input:focus,
+main .main-container .filter .input-place div input:valid {
+  border: 2px solid black;
+  color: black;
+}
+
+main .main-container .filter .button-place {
+  margin-top: 30px;
+  width: 100%;
+  padding: 0 20px;
+}
+
+main .main-container .filter .button-place button {
+  background-color: #54b435;
+  width: 120px;
+  font-size: 16px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+main .main-container .filter .button-place button:hover {
+  background-color: #82cd47;
+}
+
+main .main-container .content {
+  width: 100%;
+  margin: 50px auto;
+}
+
+main .main-container .content .sort-reply {
+  width: 20%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+main .main-container .content .sort-reply div a {
+  color: #6c7293;
+  font-size: 16px;
+}
+
+main .main-container .content .sort-reply div a:hover {
+  color: green;
+}
+
+main .main-container .content .sort-reply div a.active {
+  font-weight: bold;
+  color: green;
+}
+
+main .main-container .content .sort-rating {
+  margin: 30px 20px;
+  padding: 30px 0;
+  display: flex;
+  width: 50%;
+  justify-content: space-between;
+  border-top: 2px solid grey;
+  border-bottom: 2px solid grey;
+}
+
+main .main-container .content .sort-rating div {
+  height: 35px;
+  width: 85px;
+  background-color: #54b435;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  padding: 10px;
+}
+
+main .main-container .content .sort-rating div.active,
+main .main-container .content .sort-rating div:hover {
+  background-color: #82cd47;
+  font-weight: bold;
+}
+
+main .main-container .content .feedback-place,
+main .product-place {
+  width: 100%;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+main .main-container .content .feedback-place .table-section {
+  overflow: auto;
+}
+
+main .main-container .content .feedback-place table,
+main .product-place table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 95%;
+  margin: 0 auto;
+}
+
+main .main-container .content .feedback-place table td,
+main .product-place table td {
+  padding: 18px 0;
+  text-align: justify;
+  font-weight: 0;
+  word-wrap: break-all;
+}
+
+main .main-container .content .feedback-place table td:last-child {
+  width: 120px;
+}
+main .main-container .content .feedback-place table td:first-child {
+  width: 180px;
+}
+
+main .main-container .content .feedback-place table td:nth-child(2) {
+  width: 250px;
+}
+
+main .main-container .content .feedback-place table td:nth-child(3) {
+  width: 300px;
+}
+
+main .main-container .content .feedback-place table td:nth-child(4) {
+  width: 150px;
+}
+
+main
+  .main-container
+  .content
+  .feedback-place
+  table
+  td
+  main
+  .main-container
+  .content
+  .feedback-place
+  table
+  img {
+  width: 100px;
+  height: 100px;
+}
+
+main .main-container .content .feedback-place table thead,
+main .product-place table thead {
+  border-bottom: 1px solid #6c72937f;
+  color: black;
+}
+
+main .main-container .content .feedback-place table tbody,
+main .product-place table tbody {
+  color: black;
+  padding: 5px 0;
+}
+
+main .main-container .content .feedback-place table thead td,
+main .product-place table thead td {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 16px;
+  padding: 18px 0;
+  text-align: left;
+  color: black;
+}
+
+main .main-container .content .feedback-place table img {
+  width: 100px;
+  height: 100px;
+}
+
+main .main-container .content .feedback-place table tbody tr td .approve {
+  color: green;
+}
+
+main .main-container .content .feedback-place table tbody tr td .not-approve {
+  color: red;
+}
+
+main .main-container .content .feedback-place table tbody tr:not(:last-child),
+main .product-place table tbody tr:not(:last-child) {
+  border-bottom: 1px solid #6c72937f;
+  padding: 5px 0;
+}
+
+main .main-container .content .feedback-place table tbody tr td,
+main .product-place table tbody tr td {
+  font-size: 16px;
+  padding: 18px 0;
+  text-align: justify;
+}
+
+main .feedback-place table tbody tr td .feedback-info p:not(:first-child) {
+  margin-top: 20px;
+}
+
+main .feedback-place table tbody tr td textarea {
+  background-color: white;
+  outline: none;
+  border: 2px solid #6c7293;
+  color: black;
+  padding: 10px 8px;
+  width: 80%;
+}
+
+main .main-container .content .feedback-place table tbody tr td textarea:focus,
+main .product-place table tbody tr td textarea:focus {
+  border: 2px solid black;
+}
+
+main .main-container .content .feedback-place table tbody tr td .text-place {
+  width: 80%;
+}
+
+main .main-container .content .feedback-place table tbody tr td button {
+  cursor: pointer;
+  width: 60%;
+  height: 35px;
+  background-color: #54b435;
+  border-radius: 3px;
+  font-size: 16px;
+}
+
+main .main-container .content .feedback-place table tbody tr td button:hover {
+  background-color: #82cd47;
+}
+
+.shadow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 2;
+  display: none;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+@media screen and (max-width: 767px) {
+  .logo .menu-icon {
+    color: black;
+    font-size: 20px;
+    margin-right: 14px;
+    cursor: pointer;
+  }
+  .logo .logo-name {
+    color: black;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  span.logo-name {
+    color: black;
+    font-size: 16px;
+  }
+
+  nav .user-info {
+    float: right;
+    padding-right: 5px;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  nav .user-info img {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+  }
+
+  .list .nav-link {
+    font-size: 14px;
+  }
+  .lists .nav-link:hover {
+    background-color: #76a463;
+  }
+  .nav-link .icon {
+    margin-right: 14px;
+    font-size: 20px;
+    color: black;
+  }
+  .nav-link .link {
+    font-size: 14px;
+    color: black;
+    font-weight: 400;
+  }
+
+  main .main-container {
+    width: 95%;
+  }
+
+  main .main-container .title h1 {
+    font-size: 24px;
+  }
+
+  main .main-container .title .rate .score {
+    font-size: 24px;
+  }
+
+  main .main-container .title .rate .total {
+    font-size: 20px;
+  }
+
+  main .main-container .filter {
+  }
+
+  main .main-container .filter .input-place {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  main .main-container .filter .input-place div {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  main .main-container .filter .button-place {
+    justify-content: space-between;
+    display: flex;
+  }
+
+  main .main-container .filter .button-place button {
+    width: 46%;
+    margin: 0;
+  }
+
+  main .main-container .content .sort-reply {
+    width: 100%;
+  }
+
+  main .main-container .content .sort-rating {
+    margin: 30px 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    gap: 30px;
+  }
+
+  main .main-container .content .sort-rating div {
+    margin: auto;
+    width: 50%;
+    height: 50px;
+    border-radius: 5px;
+  }
+
+  main .main-container .content .feedback-place table td:first-child {
+    width: 250px;
+  }
+}
