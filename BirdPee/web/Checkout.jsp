@@ -64,7 +64,7 @@
                             <h4><%= ac.getUsername()%></h4>
                         </li>
                     </a>
-                    <a href="#">
+                    <a href="Notification.jsp">
                         <li>
                             <div class="header__icon_circle noti" current-count="0">
                                 <i class="fas fa-solid fa-bell"></i>

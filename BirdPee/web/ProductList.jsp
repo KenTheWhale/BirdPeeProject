@@ -84,7 +84,7 @@
                             <h4><%= (ac == null) ? "Account" : ac.getUsername()%></h4>
                         </li>
                     </a>
-                    <a href="Notification.html">
+                    <a href="<%= (ac == null) ? "Login.jsp" : "Notification.jsp"%>">
                         <li>
                             <div class="header__icon_circle noti" current-count="0">
                                 <i class="fas fa-solid fa-bell"></i>

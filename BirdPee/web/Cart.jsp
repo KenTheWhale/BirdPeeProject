@@ -70,15 +70,15 @@
 
             <div class="header__icon">
                 <ul>
-                    <a href = "<%= (ac == null) ? "Login.jsp" : "Profile.jsp"%>">
+                    <a href = "Profile.jsp">
                         <li>
                             <div class="header__icon_circle">
                                 <i class="fas fa-solid fa-user"></i>
                             </div>
-                            <h4><%= (ac == null) ? "Account" : ac.getUsername()%></h4>
+                            <h4><%= ac.getUsername()%></h4>
                         </li>
                     </a>
-                    <a href="#">
+                    <a href="Notification.jsp">
                         <li>
                             <div class="header__icon_circle noti" current-count="0">
                                 <i class="fas fa-solid fa-bell"></i>
@@ -86,7 +86,7 @@
                             <h4>Notification</h4>
                         </li>
                     </a>
-                    <a href = "<%= (ac == null) ? "Login.jsp" : "Cart.jsp"%>">
+                    <a href = "Cart.jsp">
                         <li>
                             <div class="header__icon_circle shopping-bag" current-count="<%= (ac == null) ? 0 : BirdPeeDAO.CART_countNumberOfItemInCart(ac.getId())%>">
                                 <i class="fas fa-solid fa-bag-shopping"></i>

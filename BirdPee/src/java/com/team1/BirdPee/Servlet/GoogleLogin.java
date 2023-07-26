@@ -51,7 +51,7 @@ public class GoogleLogin extends HttpServlet {
             } else{
                 session.setAttribute("user", ac);
             }
-            request.getRequestDispatcher("Homepage.jsp").forward(request, response);
+            response.sendRedirect("Homepage.jsp");
         }
     }
 

@@ -67,7 +67,7 @@
                             <h4><%= ac.getUsername()%></h4>
                         </li>
                     </a>
-                    <a href="#">
+                    <a href="Notification.jsp">
                         <li>
                             <div class="header__icon_circle noti" current-count="0">
                                 <i class="fas fa-solid fa-bell"></i>
@@ -119,7 +119,7 @@
                             </a>
                         </div>
                         <div class="nav-main-link">
-                            <a href="#" class="nav-main-link-inner">
+                            <a href="Notification.jsp" class="nav-main-link-inner">
                                 <div class="nav-main-link-logo">
                                     <i class="fa-solid fa-bell" style="color: #1d9f26;"></i>
                                 </div>
@@ -178,7 +178,7 @@
                                             <td class="table-row-title">
                                                 <label>Email</label>
                                             </td>
-                                            <td class="table-row-one">
+                                            <td class="table-row-four">
                                                 <div class="table-input-email">
                                                     <input type="email" name="mail" value="<%= ac.getEmail()%>" readonly>
                                                 </div>
@@ -200,9 +200,9 @@
                                             </td>
                                             <td class="table-row-one">
                                                 <div class="table-radio-gender">
-                                                    <span> <input type="radio" name="gender" value="Male" id="Male" <%= (ac.getGender().equalsIgnoreCase("Male")) ? "checked" : ""%> required> <label
+                                                    <span> <input class="gender" type="radio" name="gender" value="Male" id="Male" <%= (ac.getGender().equalsIgnoreCase("Male")) ? "checked" : ""%> required> <label
                                                             for="Male">Male</label> </span>
-                                                    <span> <input type="radio" name="gender" value="Female" id="Female" <%= (ac.getGender().equalsIgnoreCase("Female")) ? "checked" : ""%> required> <label
+                                                    <span> <input class="gender" type="radio" name="gender" value="Female" id="Female" <%= (ac.getGender().equalsIgnoreCase("Female")) ? "checked" : ""%> required> <label
                                                             for="Female">Female</label></span>
                                                 </div>
                                             </td>

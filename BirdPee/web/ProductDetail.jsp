@@ -69,7 +69,7 @@
                             <h4><%= (ac == null) ? "Account" : ac.getUsername()%></h4>
                         </li>
                     </a>
-                    <a href="#">
+                    <a href="<%= (ac == null) ? "Login.jsp" : "Notification.jsp"%>">
                         <li>
                             <div class="header__icon_circle noti" current-count="0">
                                 <i class="fas fa-solid fa-bell"></i>
@@ -186,7 +186,7 @@
                         </div>
 
                         <div class="product-section">
-                            <div><i class="fa-solid fa-star" style="color: green"></i> <%= String.format("%.0f", shop.getRating())%></div>
+                            <div><i class="fa-solid fa-star" style="color: green"></i> <%= BirdPeeDAO.SHOPOWNER_getRating(shop.getId())%></div>
                             <p>Rating</p>
                         </div>
                         <div class="button-place">

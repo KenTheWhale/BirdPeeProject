@@ -55,7 +55,7 @@
                             <h4><%= ac.getUsername()%></h4>
                         </li>
                     </a>
-                    <a href="#">
+                    <a href="Notification.jsp">
                         <li>
                             <div class="header__icon_circle noti" current-count="0">
                                 <i class="fas fa-solid fa-bell"></i>
@@ -75,74 +75,76 @@
             </div>
         </header>
         <main>
-            <div class="main-nav">
-                <div class="nav-header">
-                    <div class="nav-header-avatar">
-                        <div class="nav-header-image-wrapper">
-                            <img src="<%= ac.getImg()%>" alt="avatar">
+            <div class="main-container">
+                <div class="main-nav">
+                    <div class="nav-header">
+                        <div class="nav-header-avatar">
+                            <div class="nav-header-image-wrapper">
+                                <img src="<%= ac.getImg()%>" alt="avatar">
+                            </div>
+                        </div>
+                        <div class="nav-header-right">
+                            <div class="nav-header-username">
+                                <%= ac.getUsername()%>
+                            </div>
                         </div>
                     </div>
-                    <div class="nav-header-right">
-                        <div class="nav-header-username">
-                            <%= ac.getUsername()%>
+                    <div class="nav-main">
+                        <div class="nav-main-link">
+                            <a href="Profile.jsp" class="nav-main-link-inner">
+                                <div class="nav-main-link-logo">
+                                    <i class="fa-sharp fa-regular fa-user" style="color: blue;"></i>
+                                </div>
+                                <span style="margin-left: 10px;">My Profile</span>
+                            </a>
+                        </div>
+                        <div class="nav-main-link">
+                            <a href="Address.jsp" class="nav-main-link-inner">
+                                <div class="nav-main-link-logo">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                </div>
+                                <span style="margin-left: 10px;">My Address</span>
+                            </a>
+                        </div>
+                        <div class="nav-main-link">
+                            <a href="Notification.jsp" class="nav-main-link-inner">
+                                <div class="nav-main-link-logo">
+                                    <i class="fa-solid fa-bell" style="color: #1d9f26;"></i>
+                                </div>
+                                <span style="margin-left: 10px;">Notification</span>
+                            </a>
+                        </div>
+                        <div class="nav-main-link">
+                            <a href="OrderHistory.jsp" class="nav-main-link-inner">
+                                <div class="nav-main-link-logo">
+                                    <i class="fa-regular fa-clipboard" style="color: #005eff;"></i>
+                                </div>
+                                <span style="margin-left: 10px;">Order History</span>
+                            </a>
+                        </div>
+                        <div class="nav-main-link">
+                            <a href="BirdPee?action=Signout" class="nav-main-link-inner">
+                                <div class="nav-main-link-logo">
+                                    <i class="fa-solid fa-arrow-right-from-bracket"  style="color: #4502ff;"></i>
+                                </div>
+                                <span style="margin-left: 10px;">Log Out</span>
+                            </a>
                         </div>
                     </div>
                 </div>
-                <div class="nav-main">
-                    <div class="nav-main-link">
-                        <a href="Profile.jsp" class="nav-main-link-inner">
-                            <div class="nav-main-link-logo">
-                                <i class="fa-sharp fa-regular fa-user" style="color: blue;"></i>
-                            </div>
-                            <span style="margin-left: 10px;">My Profile</span>
-                        </a>
+                <div class="main-right">
+                    <div class="main-right-header">
+                        <h1>Notification</h1>
                     </div>
-                    <div class="nav-main-link">
-                        <a href="Address.jsp" class="nav-main-link-inner">
-                            <div class="nav-main-link-logo">
-                                <i class="fa-solid fa-location-dot"></i>
+                    <div class="main-right-content">
+                        <div class="noti">
+                            <div class="noti-logo">
+                                <img src="../images/img-01.png" alt="">
                             </div>
-                            <span style="margin-left: 10px;">My Address</span>
-                        </a>
-                    </div>
-                    <div class="nav-main-link">
-                        <a href="#" class="nav-main-link-inner">
-                            <div class="nav-main-link-logo">
-                                <i class="fa-solid fa-bell" style="color: #1d9f26;"></i>
+                            <div class="noti-desc">
+                                <h3>This is A NOTI</h3>
+                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia officia perferendis recusandae magni commodi voluptate corporis alias. Cum aut sed enim labore, natus, expedita veritatis sequi rerum quae pariatur modi?</p>
                             </div>
-                            <span style="margin-left: 10px;">Notification</span>
-                        </a>
-                    </div>
-                    <div class="nav-main-link">
-                        <a href="OrderHistory.jsp" class="nav-main-link-inner">
-                            <div class="nav-main-link-logo">
-                                <i class="fa-regular fa-clipboard" style="color: #005eff;"></i>
-                            </div>
-                            <span style="margin-left: 10px;">Order History</span>
-                        </a>
-                    </div>
-                    <div class="nav-main-link">
-                        <a href="BirdPee?action=Signout" class="nav-main-link-inner">
-                            <div class="nav-main-link-logo">
-                                <i class="fa-solid fa-arrow-right-from-bracket"  style="color: #4502ff;"></i>
-                            </div>
-                            <span style="margin-left: 10px;">Log Out</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="main-right">
-                <div class="main-right-header">
-                    <h1>Notification</h1>
-                </div>
-                <div class="main-right-content">
-                    <div class="noti">
-                        <div class="noti-logo">
-                            <img src="../images/img-01.png" alt="">
-                        </div>
-                        <div class="noti-desc">
-                            <h3>This is A NOTI</h3>
-                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia officia perferendis recusandae magni commodi voluptate corporis alias. Cum aut sed enim labore, natus, expedita veritatis sequi rerum quae pariatur modi?</p>
                         </div>
                     </div>
                 </div>

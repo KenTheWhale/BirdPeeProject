@@ -323,7 +323,7 @@ main .main-container .content .feedback-place table td:last-child {
   width: 120px;
 }
 main .main-container .content .feedback-place table td:first-child {
-  width: 180px;
+  width: 120px;
 }
 
 main .main-container .content .feedback-place table td:nth-child(2) {
@@ -331,12 +331,27 @@ main .main-container .content .feedback-place table td:nth-child(2) {
 }
 
 main .main-container .content .feedback-place table td:nth-child(3) {
+    width: 180px
+}
+
+
+main .main-container .content .feedback-place table td:nth-child(4) {
   width: 300px;
 }
 
-main .main-container .content .feedback-place table td:nth-child(4) {
+main .main-container .content .feedback-place table td:nth-child(5) {
   width: 150px;
 }
+
+
+main .main-container .content .feedback-place table td:nth-child(6) {
+  width: 300px;
+}
+
+main .main-container .content .feedback-place table td:nth-child(7) {
+  width: 180px;
+}
+
 
 main
   .main-container

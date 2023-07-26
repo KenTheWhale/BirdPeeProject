@@ -129,6 +129,9 @@ public class BirdPee extends HttpServlet {
                     case "AddAddress":
                         destination = "AddAddress";
                         break;
+                    case "AddNewAddress":
+                        destination = "AddAddress.jsp";
+                        break;
                     case "EditAddress":
                         destination = "EditAddress";
                         break;

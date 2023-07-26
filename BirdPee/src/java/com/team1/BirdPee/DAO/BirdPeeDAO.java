@@ -532,7 +532,15 @@ public class BirdPeeDAO {
         }
     }
 
-// Get feedback by customer id
+// Get customer notification
+    public static ArrayList<String> ACCOUNT_getNotification(int customerID) throws Exception{
+        ArrayList<String> listN = new ArrayList<>();
+        
+        return listN;
+    }
+    
+    //--- Get customer feedback reply
+    
 //-----//
 //-----//
 //----------------------------- CANCELLATION -----------------------------//

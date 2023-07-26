@@ -269,7 +269,6 @@ textarea:-ms-input-placeholder { color: #999999; }
 
 .Create-account-pointer{
     display: flex;
-    margin-top: 40%;
     justify-content: center;
 }
 .login-title{

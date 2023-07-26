@@ -65,7 +65,7 @@
                             <h4><%= ac.getUsername()%></h4>
                         </li>
                     </a>
-                    <a href="#">
+                    <a href="Notification.jsp">
                         <li>
                             <div class="header__icon_circle noti" current-count="0">
                                 <i class="fas fa-solid fa-bell"></i>
@@ -117,7 +117,7 @@
                             </a>
                         </div>
                         <div class="nav-main-link">
-                            <a href="#" class="nav-main-link-inner">
+                            <a href="Notification.jsp" class="nav-main-link-inner">
                                 <div class="nav-main-link-logo">
                                     <i class="fa-solid fa-bell" style="color: #1d9f26;"></i>
                                 </div>
@@ -169,7 +169,7 @@
                                 }
                             %>
                         </table>
-                        <button><a href="AddAddress.jsp"> + ADD NEW ADDRESS</a></button>
+                        <button style="margin-right: 20px" name="action" value="AddNewAddress"> + ADD NEW ADDRESS</a></button>
                         <button style="margin-right: 20px" name="action" value="ChosenAddress">SAVE ADDRESS</button>
                     </form>
                 </div>

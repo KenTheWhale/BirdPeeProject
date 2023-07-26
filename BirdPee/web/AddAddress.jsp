@@ -55,7 +55,7 @@
                             <h4><%= ac.getUsername()%></h4>
                         </li>
                     </a>
-                    <a href="#">
+                    <a href="Notification.jsp">
                         <li>
                             <div class="header__icon_circle noti" current-count="0">
                                 <i class="fas fa-solid fa-bell"></i>
@@ -107,7 +107,7 @@
                             </a>
                         </div>
                         <div class="nav-main-link">
-                            <a href="#" class="nav-main-link-inner">
+                            <a href="Notification.jsp" class="nav-main-link-inner">
                                 <div class="nav-main-link-logo">
                                     <i class="fa-solid fa-bell" style="color: #1d9f26;"></i>
                                 </div>
@@ -208,24 +208,29 @@
                                         <p><%= request.getParameter("districtid") != null ? BirdPeeDAO.SHIP_getDistrictNameByID(request.getParameter("districtid")) : "District"%></p>
                                         <i class="fa-solid fa-angle-down" style="font-size: 12px; "></i>
                                     </div>
+                                    <%
+                                        if (request.getParameter("provinceid") != null) {
+                                    %>
                                     <ul class="options">
                                         <%
-                                            if (request.getParameter("provinceid") != null) {
-                                                ArrayList<String> listDistrict = BirdPeeDAO.SHIP_getDistrictByProvinceID(request.getParameter("provinceid"));
-                                                for (String district : listDistrict) {
-                                                    String districtName = district.split("@")[0];
-                                                    int districtID = Integer.parseInt(district.split("@")[1]);
+                                            ArrayList<String> listDistrict = BirdPeeDAO.SHIP_getDistrictByProvinceID(request.getParameter("provinceid"));
+                                            for (String district : listDistrict) {
+                                                String districtName = district.split("@")[0];
+                                                int districtID = Integer.parseInt(district.split("@")[1]);
                                         %>
                                         <li><a href="AddAddress.jsp?provinceid=<%= request.getParameter("provinceid")%>&districtid=<%= districtID%>"><%= districtName%></a></li>
                                             <%
-                                                    }
                                                 }
                                             %>
                                     </ul>
+                                    <%
+                                        }
+                                    %>
+
                                 </div>
                                 <span class="input-button">
                                     <input type="hidden" name="districtid" value="<%= request.getParameter("districtid")%>"/>
-                                    <button style="padding: 8px 50px 8px 50px;<%= (request.getParameter("provinceid") != null && request.getParameter("districtid") != null && !name.isEmpty() && !phone.isEmpty() && !address.isEmpty()) ? "" : "background-color: gray" %>" name="action" value="AddAddress" <%= (request.getParameter("provinceid") != null && request.getParameter("districtid") != null && !name.isEmpty() && !phone.isEmpty() && !address.isEmpty()) ? "" : "disabled" %>>SAVE</button>
+                                    <button style="padding: 8px 50px 8px 50px;<%= (request.getParameter("provinceid") != null && request.getParameter("districtid") != null && !name.isEmpty() && !phone.isEmpty() && !address.isEmpty()) ? "" : "background-color: gray"%>" name="action" value="AddAddress" <%= (request.getParameter("provinceid") != null && request.getParameter("districtid") != null && !name.isEmpty() && !phone.isEmpty() && !address.isEmpty()) ? "" : "disabled"%>>SAVE</button>
                                     <button style="padding: 8px 38px 8px 38px;" name="action" value="ReturnAddress">CANCEL</button>
                                 </span>
                             </div>
@@ -243,7 +248,7 @@
                 let nameValue = name.value;
                 let phoneValue = phone.value;
                 let addressValue = address.value;
-                
+
                 document.cookie = "name=" + encodeURIComponent(nameValue);
                 document.cookie = "phone=" + encodeURIComponent(phoneValue);
                 document.cookie = "address=" + encodeURIComponent(addressValue);

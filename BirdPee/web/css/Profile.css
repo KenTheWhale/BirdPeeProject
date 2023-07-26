@@ -259,12 +259,21 @@ td.table-row-one{
     margin-top: 4%;
 }
 main .table-row-one input{
-    padding: 5px 250px 5px 10px;
+    padding: 5px 125px 5px 10px;
 
 }
+main .table-row-four input{
+    padding: 5px 50px 5px 10px;
+    width: 300px;
+
+}
+.table-row-four{
+    display: flex;
+    margin-left: 20px;
+    align-items: center;
+}
 main .table-row-two input{
-    padding: 5px 5px 5px 10px;
-    padding: 5px 100px 5px 0px;
+    padding: 5px 10px 5px 0px;
 }
 main .table-row-three button{
     background-color: rgb(236, 233, 233); /* Green */
