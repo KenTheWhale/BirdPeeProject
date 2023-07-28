@@ -31,7 +31,7 @@
             />
         <link rel="icon" type="image/x-icon" href="images/logo2.png" />
 
-        <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
         <title>BirdPee - Shop Owner</title>
     </head>
     <body>
@@ -50,7 +50,7 @@
 
             <div class="user-info">
                 <img src="https://cdn-icons-png.flaticon.com/512/552/552721.png" alt="" />
-                <h3><%= ac.getUsername()%></h3>
+                <h3><%= ac.getUsername().split("#")[1]%></h3>
             </div>
 
             <div class="sidebar">
@@ -80,7 +80,7 @@
                             </a>
                         </li>
                         <li class="list">
-                             <a href="SO_ShopProfileManagement.jsp?provinceid=<%= BirdPeeDAO.SHIP_getProvinceIDByShopID(s.getId()).trim() %>&districtid=<%= BirdPeeDAO.SHIP_getDistrictIDByShopID(s.getId()).trim() %>" class="nav-link">
+                            <a href="SO_ShopProfileManagement.jsp?provinceid=<%= BirdPeeDAO.SHIP_getProvinceIDByShopID(s.getId()).trim()%>&districtid=<%= BirdPeeDAO.SHIP_getDistrictIDByShopID(s.getId()).trim()%>" class="nav-link">
                                 <i class="bx bxs-store-alt icon"></i>
                                 <span class="link">SHOP PROFILE</span>
                             </a>
@@ -146,7 +146,7 @@
                                     if (request.getParameter("sort") != null) {
                                         sort = request.getParameter("sort");
                                     }
-                                    ArrayList<Order> listO = BirdPeeDAO.SHOPOWNER_getAllOrderItemBySort(sort);
+                                    ArrayList<Order> listO = BirdPeeDAO.SHOPOWNER_getAllOrderItemBySort(sort, s.getId());
                                     for (Order o : listO) {
                                 %>
                             <form action="BirdPee" method="post">
@@ -185,13 +185,54 @@
                         </table>
                     </div>
                 </div>
+                <div class="send-mail">
+                    <h1>Mail Management</h1>
+
+                    <div class="table-section">
+                        <table class="mail-table">
+                            <thead>
+                                <tr>
+                                    <td>Order ID</td>
+                                    <td>Customer Name</td>
+                                    <td>Customer Email</td>
+                                    <td>Action</td>
+                                </tr>
+                            </thead>
+                            <tbody class="tbody">
+                                <%
+                                    listO = BirdPeeDAO.SHOPOWNER_getAllOrderItemBySort("", s.getId());
+                                    for (Order o : listO) {
+                                %>
+                            <form action="BirdPee" method="post">
+                                <tr class="tr">
+                                    <td>
+                                        <%= o.getId()%>
+                                    </td>
+                                    <td><%= BirdPeeDAO.ACCOUNT_getCustomerNameByCustomerID(o.getCustomerID())%></td>
+                                    <td><%= BirdPeeDAO.ACCOUNT_getCustomerByID(o.getCustomerID()).getEmail()%></td>
+                                    <td>
+                                        <div class="button-place">
+                                            <input type="hidden" name="sid" value="<%= s.getId()%>"/>
+                                            <input type="hidden" name="cid" value="<%= o.getCustomerID()%>"/>
+                                            <input type="hidden" name="oid" value="<%= o.getId()%>"/>
+                                            <button class="approve-btn" style="<%= BirdPeeDAO.SHOPOWNER_checkEmail(s.getId(), o.getCustomerID(), o.getId()) ? "background-color: gray; color: white" : ""%>" name="action" value="SOMailSend" <%= BirdPeeDAO.SHOPOWNER_checkEmail(s.getId(), o.getCustomerID(), o.getId()) ? "disabled" : ""%>>Send</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </form>
+                            <%
+                                }
+                            %>
+                            </tbody>
+                        </table>
+                    </div>                   
+                </div>
             </div>
             <%
                 if (request.getParameter("id") != null) {
                     int oid = Integer.parseInt(request.getParameter("id"));
                     Order o = BirdPeeDAO.ORDER_getOrderByID(oid);
                     ArrayList<OrderDetails> listOD = o.getListOD();
-
             %>
             <div id="popup" class="show">
                 <% //
@@ -201,23 +242,23 @@
                     <img src="<%= BirdPeeDAO.PRODUCT_getImages(item.getProductID()).get(0)%>" alt="" />
                 </div>
                 <div class="content">
-                    <div>Product ID: <span><%= item.getProductID() %></span></div>
+                    <div>Product ID: <span><%= item.getProductID()%></span></div>
                     <div>Order date: <span><%= BirdPeeDAO.DATESTRINGCONVERTER_convertUtilDateToStringInCheckOut(o.getCreateDate(), 0)%></span></div>
                     <div>Ship date: <span><%= BirdPeeDAO.DATESTRINGCONVERTER_convertUtilDateToStringInCheckOut(o.getShipDate(), 0)%></span></div>
-                    <div>Product Name: <span><%= item.getProductName() %></span></div>
+                    <div>Product Name: <span><%= item.getProductName()%></span></div>
                     <div>Customer Name: <span><%= BirdPeeDAO.ACCOUNT_getCustomerNameByCustomerID(o.getCustomerID())%></span></div>
-                    <div>Unit Price: <span><%= String.format("%,d", item.getInitPrice())%> VND</span></div>
-                    <div>Total Price: <span><%= String.format("%,d", item.getInitPrice() + item.getShipPrice())%> VND</span></div>
+                    <div>Unit Price: <span><%= String.format("%,.0f", item.getInitPrice())%> VND</span></div>
+                    <div>Total Price: <span><%= String.format("%,.0f", item.getInitPrice() + item.getShipPrice())%> VND</span></div>
                     <div>Quantity: <span><%= item.getQuantity()%></span></div>
-                    <div>Discount: <span><%= BirdPeeDAO.DISCOUNT_getDiscountPercentageByProductID(item.getProductID()) == 0 ? "No discount" : String.format("%,d", BirdPeeDAO.DISCOUNT_getDiscountPercentageByProductID(item.getProductID()) * 100)%><%= BirdPeeDAO.DISCOUNT_getDiscountPercentageByProductID(item.getProductID()) == 0 ? "" : "%"%></span></div>
+                    <div>Discount: <span><%= BirdPeeDAO.DISCOUNT_getDiscountPercentageByProductID(item.getProductID()) == 0 ? "No discount" : String.format("%,.0f", BirdPeeDAO.DISCOUNT_getDiscountPercentageByProductID(item.getProductID()) * 100)%><%= BirdPeeDAO.DISCOUNT_getDiscountPercentageByProductID(item.getProductID()) == 0 ? "" : "%"%></span></div>
                     <div>Ship type: <span><%= BirdPeeDAO.SHIP_getShipType(o.getPaymentTypeID())%></span></div>
                     <div>Payment method: <span><%= BirdPeeDAO.ORDER_getPaymentMethod(o.getPaymentMethodID())%></span></div>
                     <div>Status: <span><%= BirdPeeDAO.ORDER_getOrderStatus(o.getId())%></span></div>
                 </div>
-                <div id="close"><a href="SO_OrderManagement.jsp"> &times;</a></div>
                 <%//
                     }
                 %>
+                <div id="close"><a href="SO_OrderManagement.jsp"> &times;</a></div>
             </div>
             <%//
                 }
@@ -228,5 +269,6 @@
             }
         %>
         <script src="js/SO_OrderManagement.js"></script>
+        <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     </body>
 </html>

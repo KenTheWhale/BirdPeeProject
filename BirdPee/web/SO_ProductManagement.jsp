@@ -50,7 +50,7 @@
 
             <div class="user-info">
                 <img src="https://cdn-icons-png.flaticon.com/512/552/552721.png" alt="" />
-                <h3><%= ac.getUsername()%></h3>
+                <h3><%= ac.getUsername().split("#")[1]%></h3>
             </div>
 
             <div class="sidebar">
@@ -301,33 +301,33 @@
                                 </select>
                             </div>
 
-                                <div class="input-row">
-                                    <textarea name="shortdesc" id="" cols="10"
-                                              rows="2"
-                                              style="width: 100%; padding: 10px"
-                                              placeholder="Product Short Desciption"
-                                              ></textarea>
-                                </div>
-
-                                <div class="input-row">
-                                    <textarea
-                                        name="fulldesc"
-                                        id=""
-                                        cols="40"
-                                        rows="8"
-                                        style="width: 100%; padding: 10px"
-                                        placeholder="Product Desciption"
-                                        ></textarea>
-                                </div>
+                            <div class="input-row">
+                                <textarea name="shortdesc" id="" cols="10"
+                                          rows="2"
+                                          style="width: 100%; padding: 10px"
+                                          placeholder="Product Short Desciption"
+                                          ></textarea>
                             </div>
 
-
-                            <div class="button-place">
-                                <input type="hidden" name="shopid" value="<%= s.getId()%>"/>
-                                <button name="action" value="SOCreateProduct">Create</button>
+                            <div class="input-row">
+                                <textarea
+                                    name="fulldesc"
+                                    id=""
+                                    cols="40"
+                                    rows="8"
+                                    style="width: 100%; padding: 10px"
+                                    placeholder="Product Desciption"
+                                    ></textarea>
                             </div>
                         </div>
+
+
+                        <div class="button-place">
+                            <input type="hidden" name="shopid" value="<%= s.getId()%>"/>
+                            <button name="action" value="SOCreateProduct">Create</button>
+                        </div>
                     </div>
+                </div>
                 </div>
             </form>
             <div class="shadow"></div>

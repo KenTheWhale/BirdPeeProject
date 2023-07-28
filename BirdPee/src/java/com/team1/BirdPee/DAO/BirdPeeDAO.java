@@ -533,20 +533,91 @@ public class BirdPeeDAO {
     }
 
 // Get customer notification
-    public static ArrayList<String> ACCOUNT_getNotification(int customerID) throws Exception{
+    public static ArrayList<String> ACCOUNT_getNotification(int customerID) throws Exception {
         ArrayList<String> listN = new ArrayList<>();
-        
+        Connection cn = DBUtils.getConnection();
+        if (cn != null) {
+            String sql = "select productid, reply, orderid, date as createdate from Feedback where isReported = 0 and status = 1 and customerid = ?\n"
+                    + "union all\n"
+                    + "select productid, Order_Status.status, orderid, createdate as createdate from Orders, Order_Details, Order_Status where orderid = Orders.id and Orders.status = Order_Status.id and customerid = ?\n"
+                    + "order by createdate desc, orderid desc";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, customerID);
+            pst.setInt(2, customerID);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    listN.add(rs.getInt(1) + "@" + rs.getString(2) + "@" + rs.getInt(3) + "@" + DATESTRINGCONVERTER_convertUtilDateToStringInCheckOut(DATESTRINGCONVERTER_convertSQLDatetoUtilDate(rs.getDate(4)), 0));
+                }
+            }
+            cn.close();
+        }
+
         return listN;
     }
-    
-    //--- Get customer feedback reply
-    
+
+// Check if it is feedback reply
+    public static boolean ACCOUNT_checkIfFeedback(String message) throws Exception {
+        return (!message.equalsIgnoreCase("Cancel")
+                && !message.equalsIgnoreCase("Processing")
+                && !message.equalsIgnoreCase("Packed")
+                && !message.equalsIgnoreCase("In delivery")
+                && !message.equalsIgnoreCase("Successful"));
+    }
+
+// Follow a shop
+    public static void ACCOUNT_followShop(int shopID, int customerID) throws Exception {
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "insert into Shop_Follower(shopid, customerid)\n"
+                    + "values(?,?)";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, shopID);
+            pst.setInt(2, customerID);
+            pst.executeUpdate();
+            cn.close();
+        }
+    }
+
+// Unfollow a shop
+    public static void ACCOUNT_unfollowShop(int shopID, int customerID) throws Exception {
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "delete from Shop_Follower where shopid = ? and customerid = ?";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, shopID);
+            pst.setInt(2, customerID);
+            pst.executeUpdate();
+            cn.close();
+        }
+    }
+
+// Check whether customer follow the shop or not
+    public static boolean ACCOUNT_checkIfFollowed(int shopID, int customerID) throws Exception {
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select shopid, customerid from Shop_Follower where shopid = ? and customerid = ?";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, shopID);
+            pst.setInt(2, customerID);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null && rs.next()) {
+                return true;
+            }
+            cn.close();
+        }
+        return false;
+    }
 //-----//
 //-----//
 //----------------------------- CANCELLATION -----------------------------//
 //-----//
 //-----//
 // Add new cancellation
+
     public static void CANCELLATION_addCancelation(int orderID, String reason) throws Exception {
         java.sql.Date cancelDate = new java.sql.Date(new java.util.Date().getTime());
         Connection cn = DBUtils.getConnection();
@@ -1654,6 +1725,22 @@ public class BirdPeeDAO {
         }
     }
 
+// Send report
+    public static void PRODUCT_sendReport(String comment, int customerID, int productID) throws Exception {
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "insert into Feedback(comment, date, customerid, productid, isReported, status)\n"
+                    + "values(?,GETDATE(),?,?,1,0)";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setString(1, comment);
+            pst.setInt(2, customerID);
+            pst.setInt(3, productID);
+            pst.executeUpdate();
+            cn.close();
+        }
+    }
+
 // Check if send feedback or not
     public static boolean PRODUCT_checkExistedFeedback(int orderID, int productID) throws Exception {
         Connection cn = DBUtils.getConnection();
@@ -1670,6 +1757,42 @@ public class BirdPeeDAO {
             cn.close();
         }
         return false;
+    }
+
+// Get product detail feedback for comment
+    public static ArrayList<String> PRODUCT_getProductFeedback(int productID, String star) throws Exception {
+        ArrayList<String> listF = new ArrayList<>();
+        int rate = -1;
+        if (star != null) {
+            rate = Integer.parseInt(star.trim());
+        }
+
+        Connection cn = DBUtils.getConnection();
+        if (cn != null) {
+            String sql = "select img, username, date, rating, comment from Feedback, Account\n"
+                    + "where customerid = Account.id and productid = ? and isReported = 0";
+            if (star != null) {
+                sql = "select img, username, date, rating, comment from Feedback, Account\n"
+                        + "where customerid = Account.id and productid = ? and rating = ? and isReported = 0";
+            }
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, productID);
+            if (star != null) {
+                pst.setInt(2, rate);
+            }
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    listF.add(rs.getString(1)
+                            + "@" + rs.getString(2)
+                            + "@" + DATESTRINGCONVERTER_convertUtilDateToStringInCheckOut(DATESTRINGCONVERTER_convertSQLDatetoUtilDate(rs.getDate(3)), 0)
+                            + "@" + rs.getInt(4)
+                            + "@" + rs.getString(5));
+                }
+            }
+            cn.close();
+        }
+        return listF;
     }
 //-----//
 //-----//
@@ -2034,6 +2157,29 @@ public class BirdPeeDAO {
         return s;
     }
 
+// Get shop by shop's id
+    public static Shop SHOP_getShopByID(int shopID) throws Exception {
+        Shop s = new Shop();
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select id, ownerid, name, img, description, createdate\n"
+                    + "from Shop\n"
+                    + "where id = ?";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, shopID);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    s = new Shop(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getString(4), rs.getString(5), DATESTRINGCONVERTER_convertSQLDatetoUtilDate(rs.getDate(6)));
+                }
+            }
+            cn.close();
+        }
+
+        return s;
+    }
+
 // Get all shops after sort by sort
     public static ArrayList<Shop> SHOP_getAllShopAfterSorted(String sort) throws Exception {
         ArrayList<Shop> listS = new ArrayList<>();
@@ -2043,25 +2189,28 @@ public class BirdPeeDAO {
         if (cn != null) {
             switch (sort) {
                 case "Newest":
-                    sql = "select id, ownerid, name, img, description, createdate\n"
-                            + "from Shop\n"
+                    sql = "select s.id, ownerid, name, s.img, description, createdate\n"
+                            + "from Shop s, Account a\n"
+                            + "where a.status = 1 and s.ownerid = a.id\n"
                             + "order by id desc";
                     break;
                 case "A to Z":
-                    sql = "select id, ownerid, name, img, description, createdate\n"
-                            + "from Shop\n"
+                    sql = "select s.id, ownerid, name, s.img, description, createdate\n"
+                            + "from Shop s, Account a\n"
+                            + "where a.status = 1 and s.ownerid = a.id\n"
                             + "order by name";
                     break;
                 case "Z to A":
-                    sql = "select id, ownerid, name, img, description, createdate\n"
-                            + "from Shop\n"
+                    sql = "select s.id, ownerid, name, s.img, description, createdate\n"
+                            + "from Shop s, Account a\n"
+                            + "where a.status = 1 and s.ownerid = a.id\n"
                             + "order by name desc";
                     break;
                 case "Popular":
-                    sql = "select id, ownerid, name, img, description, createdate\n"
-                            + "from Shop, Shop_Follower\n"
-                            + "where id = shopid and id in (select shopid from Shop_Follower)\n"
-                            + "group by id, ownerid, name, img, description, createdate, rating\n"
+                    sql = "select s.id, ownerid, name, s.img, description, createdate\n"
+                            + "from Shop s, Shop_Follower sf, Account a\n"
+                            + "where a.status = 1 and s.ownerid = a.id and s.id in (select shopid from Shop_Follower)\n"
+                            + "group by s.id, ownerid, name, s.img, description, createdate\n"
                             + "order by count(customerid) desc";
                     break;
                 case "Rating":
@@ -2128,7 +2277,7 @@ public class BirdPeeDAO {
     }
 
 // Count number of feedback of product by product's id
-    public static int SHOP_countFeedbackPerProduct(int productid) throws Exception {
+    public static int SHOP_countFeedbackPerProduct(int productID) throws Exception {
         int count = 0;
         Connection cn = DBUtils.getConnection();
 
@@ -2137,7 +2286,28 @@ public class BirdPeeDAO {
                     + "from Feedback\n"
                     + "where productid = ?";
             PreparedStatement pst = cn.prepareStatement(sql);
-            pst.setInt(1, productid);
+            pst.setInt(1, productID);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            }
+            cn.close();
+        }
+
+        return count;
+    }
+
+// Count number of follower of shop
+    public static int SHOP_countFollowerOfShop(int shopID) throws Exception {
+        int count = 0;
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select COUNT(customerid) from Shop_Follower where shopid = ?";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, shopID);
             ResultSet rs = pst.executeQuery();
             if (rs != null) {
                 while (rs.next()) {
@@ -2216,12 +2386,122 @@ public class BirdPeeDAO {
         return listL;
     }
 
+// Get all product in shop after sort
+    public static ArrayList<Product> SHOP_getAllShopProductAfterSorted(String sort, String subSort, int shopID) throws Exception {
+        ArrayList<Product> listP = new ArrayList<>();
+        Connection cn = DBUtils.getConnection();
+        String sql = null;
+        String subSql = null;
+        int defaultRating = 0;
+        if (cn != null) {
+            if (!subSort.equalsIgnoreCase("none")) {
+                if (CATEGORY_getIDByCode(subSort) != -1) {
+                    subSql = "and cateid = " + CATEGORY_getIDByCode(subSort) + "\n";
+                }
+            }
+            switch (sort) {
+                case "Popular":
+                    sql = "select distinct soldQuantity, availableQuantity, cateid, isDiscount, shopid, Product.id, Product.name, Product.description, price\n"
+                            + "from Product\n"
+                            + "where shopid = " + shopID + " and Product.status = 'Available' and availableQuantity > 0 " + ((subSql == null) ? "\n" : subSql)
+                            + "order by soldQuantity desc";
+                    break;
+                case "Discount":
+                    sql = "select distinct soldQuantity, availableQuantity, cateid, isDiscount, shopid, Product.id, Product.name, Product.description, price, discountChoice\n"
+                            + "from Product, Discount_Details\n"
+                            + "where shopid = " + shopID + " and Product.status = 'Available' and isDiscount = 1 and Product.id = productid and availableQuantity > 0 " + ((subSql == null) ? "\n" : (subSql + "\n"))
+                            + "order by discountChoice desc";
+                    break;
+                case "Rating":
+                    sql = "select distinct soldQuantity, availableQuantity, cateid, isDiscount, shopid, Product.id, Product.name, Product.description, price, round(AVG(?), 0, 1) as rating\n"
+                            + "from Product\n"
+                            + "where shopid = " + shopID + " and Product.status = 'Available' and availableQuantity > 0 and Product.id not in\n"
+                            + "(\n"
+                            + "select Product.id\n"
+                            + "from Product, Feedback\n"
+                            + "where Product.status = 'Available' and productid = Product.id \n"
+                            + ") " + ((subSql == null) ? "\n" : subSql)
+                            + "group by Product.status, soldQuantity, availableQuantity, cateid, isDiscount, shopid, Product.id, Product.name, Product.description, price\n"
+                            + "\n"
+                            + "UNION ALL\n"
+                            + "\n"
+                            + "select distinct soldQuantity, availableQuantity, cateid, isDiscount, shopid, Product.id, Product.name, Product.description, price, round(AVG(rating), 0, 1) as rating\n"
+                            + "from Product, Feedback\n"
+                            + "where shopid = " + shopID + " and Product.status = 'Available' and productid = Product.id and availableQuantity > 0 " + ((subSql == null) ? "\n" : subSql)
+                            + "group by soldQuantity, availableQuantity, cateid, isDiscount, shopid, Product.id, Product.name, Product.description, price, Product.status\n"
+                            + "order by rating desc;";
+                    break;
+                case "Price Ascending":
+                    sql = "select distinct soldQuantity, availableQuantity, cateid, isDiscount, shopid, Product.id, Product.name, Product.description, price, (price * (100 - discountChoice) / 100) as discountprice\n"
+                            + "from Product, Discount_Details\n"
+                            + "where shopid = " + shopID + " and Product.status = 'Available' and availableQuantity > 0 and productid = Product.id and isDiscount = 1 " + ((subSql == null) ? "\n" : subSql)
+                            + "\n"
+                            + "union all\n"
+                            + "\n"
+                            + "select distinct soldQuantity, availableQuantity, cateid, isDiscount, shopid, Product.id, Product.name, Product.description, price, price as discountprice\n"
+                            + "from Product\n"
+                            + "where shopid = " + shopID + " and Product.status = 'Available' and availableQuantity > 0 and isDiscount = 0 " + ((subSql == null) ? "\n" : subSql)
+                            + "order by price";
+                    break;
+                case "Price Descending":
+                    sql = "select distinct soldQuantity, availableQuantity, cateid, isDiscount, shopid, Product.id, Product.name, Product.description, price, (price * (100 - discountChoice) / 100) as discountprice\n"
+                            + "from Product, Discount_Details\n"
+                            + "where shopid = " + shopID + " and Product.status = 'Available' and availableQuantity > 0 and productid = Product.id and isDiscount = 1 " + ((subSql == null) ? "\n" : subSql)
+                            + "\n"
+                            + "union all\n"
+                            + "\n"
+                            + "select distinct soldQuantity, availableQuantity, cateid, isDiscount, shopid, Product.id, Product.name, Product.description, price, price as discountprice\n"
+                            + "from Product\n"
+                            + "where shopid = " + shopID + " and Product.status = 'Available' and availableQuantity > 0 and isDiscount = 0 " + ((subSql == null) ? "\n" : subSql)
+                            + "order by discountprice desc";
+                    break;
+                default:
+                    sql = "select distinct soldQuantity, availableQuantity, cateid, isDiscount, shopid, Product.id, Product.name, Product.description, price\n"
+                            + "from Product\n"
+                            + "where shopid = " + shopID + " and Product.status = 'Available' and name like '%" + sort + "%'";
+                    break;
+            }
+            PreparedStatement pst = cn.prepareStatement(sql);
+            if (sort.equalsIgnoreCase("Rating")) {
+                pst.setInt(1, defaultRating);
+            }
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    listP.add(new Product(rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getString(7), rs.getString(8), rs.getFloat(9)));
+                }
+            }
+            cn.close();
+        }
+        return listP;
+    }
+
+// Get shop revenue by shop id
+    public static float SHOP_getShopRevenue(int shopID) throws Exception {
+        float revenue = 0;
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select SUM(initprice) \n"
+                    + "from Order_Details \n"
+                    + "where productid in (select id from Product where shopid = ?)";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, shopID);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null && rs.next()) {
+                revenue = rs.getFloat(1);
+            }
+            cn.close();
+        }
+        return revenue;
+    }
 //-----//
 //-----//
 //----------------------------- SHOPOWNER -----------------------------//
 //-----//
 //-----//
 // Get product by product's id
+
     public static Product SHOPOWNER_getProductByID(int productID) throws Exception {
         Product p = new Product();
         Connection cn = DBUtils.getConnection();
@@ -2345,46 +2625,58 @@ public class BirdPeeDAO {
     }
 
 // Get all order after sort
-    public static ArrayList<Order> SHOPOWNER_getAllOrderItemBySort(String sort) throws Exception {
+    public static ArrayList<Order> SHOPOWNER_getAllOrderItemBySort(String sort, int shopID) throws Exception {
         ArrayList<Order> listO = new ArrayList<>();
-        int flag = 0;
         Connection cn = DBUtils.getConnection();
 
         if (cn != null) {
             String sql = "select id, shipdate, shipaddress, createdate, status, paymenttypeid, paymentmethodid, customerid, shipid, shipdistanceid\n"
                     + "from Orders\n"
+                    + "where id in \n"
+                    + "(select orderid from Order_Details where productid in \n"
+                    + "(select id from Product where shopid = ?))\n"
                     + "order by id desc";
             if (!sort.isEmpty()) {
                 switch (sort) {
                     case "Cancel":
                         sql = "select id, shipdate, shipaddress, createdate, status, paymenttypeid, paymentmethodid, customerid, shipid, shipdistanceid\n"
                                 + "from Orders\n"
-                                + "where status = 1\n"
+                                + "where status = 1 and id in \n"
+                                + "(select orderid from Order_Details where productid in \n"
+                                + "(select id from Product where shopid = ?))\n"
                                 + "order by id desc";
                         break;
 
                     case "Processing":
                         sql = "select id, shipdate, shipaddress, createdate, status, paymenttypeid, paymentmethodid, customerid, shipid, shipdistanceid\n"
                                 + "from Orders\n"
-                                + "where status = 2\n"
+                                + "where status = 2 and id in \n"
+                                + "(select orderid from Order_Details where productid in \n"
+                                + "(select id from Product where shopid = ?))\n"
                                 + "order by id desc";
                         break;
                     case "Packed":
                         sql = "select id, shipdate, shipaddress, createdate, status, paymenttypeid, paymentmethodid, customerid, shipid, shipdistanceid\n"
                                 + "from Orders\n"
-                                + "where status = 3\n"
+                                + "where status = 3 and id in \n"
+                                + "(select orderid from Order_Details where productid in \n"
+                                + "(select id from Product where shopid = ?))\n"
                                 + "order by id desc";
                         break;
                     case "InDelivery":
                         sql = "select id, shipdate, shipaddress, createdate, status, paymenttypeid, paymentmethodid, customerid, shipid, shipdistanceid\n"
                                 + "from Orders\n"
-                                + "where status = 4\n"
+                                + "where status = 4 and id in \n"
+                                + "(select orderid from Order_Details where productid in \n"
+                                + "(select id from Product where shopid = ?))\n"
                                 + "order by id desc";
                         break;
                     case "Successful":
                         sql = "select id, shipdate, shipaddress, createdate, status, paymenttypeid, paymentmethodid, customerid, shipid, shipdistanceid\n"
                                 + "from Orders\n"
-                                + "where status = 5\n"
+                                + "where status = 5 and id in \n"
+                                + "(select orderid from Order_Details where productid in \n"
+                                + "(select id from Product where shopid = ?))\n"
                                 + "order by id desc";
                         break;
 
@@ -2397,17 +2689,16 @@ public class BirdPeeDAO {
                         }
                         sql = "select id, shipdate, shipaddress, createdate, status, paymenttypeid, paymentmethodid, customerid, shipid, shipdistanceid\n"
                                 + "from Orders\n"
-                                + "where id = ?\n"
+                                + "where status = 1 and id in \n"
+                                + "(select orderid from Order_Details where productid in \n"
+                                + "(select id from Product where shopid = ?))\n"
                                 + "order by id desc";
-                        flag = 1;
                         break;
                 }
             }
 
             PreparedStatement pst = cn.prepareStatement(sql);
-            if (flag == 1) {
-                pst.setInt(1, Integer.parseInt(sort));
-            }
+            pst.setInt(1, shopID);
             ResultSet rs = pst.executeQuery();
             if (rs != null) {
                 while (rs.next()) {
@@ -2560,13 +2851,14 @@ public class BirdPeeDAO {
         if (cn != null) {
             String sql = "select id, shipdate, shipaddress, createdate, status, paymenttypeid, paymentmethodid, customerid, shipid, shipdistanceid\n"
                     + "from Orders\n"
-                    + "where " + timeType + "(createdate) = " + timeType + "(GETDATE()) and id in (select orderid from Order_Details where productid in (select id from Product where shopid = (select id from Shop where ownerid = ?)))";
+                    + "where MONTH(createdate) = MONTH(GETDATE()) and id in (select orderid from Order_Details where productid in (select id from Product where shopid = (select id from Shop where ownerid = ?)))";
             PreparedStatement pst = cn.prepareStatement(sql);
             pst.setInt(1, ownerID);
             ResultSet rs = pst.executeQuery();
             if (rs != null) {
                 while (rs.next()) {
-                    listO.add(new Order(rs.getInt(1),
+                    listO.add(new Order(
+                            rs.getInt(1),
                             DATESTRINGCONVERTER_convertSQLDatetoUtilDate(rs.getDate(2)),
                             rs.getString(3),
                             DATESTRINGCONVERTER_convertSQLDatetoUtilDate(rs.getDate(4)),
@@ -2575,7 +2867,8 @@ public class BirdPeeDAO {
                             rs.getInt(7),
                             rs.getInt(8),
                             rs.getInt(9),
-                            rs.getInt(10), SHOPOWNER_getAllOrderItem(rs.getInt(1))));
+                            rs.getInt(10), SHOPOWNER_getAllOrderItem(rs.getInt(1))
+                    ));
                 }
             }
             cn.close();
@@ -2604,7 +2897,7 @@ public class BirdPeeDAO {
         if (cn != null) {
             String sql = "select COUNT(id)\n"
                     + "from Orders\n"
-                    + "where " + timeType + "(createdate) = " + timeType + "(GETDATE()) and id in (select orderid from Order_Details where productid in (select id from Product where shopid = (select id from Shop where ownerid = ?)))";
+                    + "where MONTH(createdate) = MONTH(GETDATE()) and id in (select orderid from Order_Details where productid in (select id from Product where shopid = (select id from Shop where ownerid = ?)))";
             PreparedStatement pst = cn.prepareStatement(sql);
             pst.setInt(1, ownerID);
             ResultSet rs = pst.executeQuery();
@@ -2624,7 +2917,7 @@ public class BirdPeeDAO {
         if (cn != null) {
             String sql = "select COUNT(id)\n"
                     + "from Orders\n"
-                    + "where " + timeType + "(createdate) = " + timeType + "(DATEADD(" + timeType.toUpperCase() + ", -1, GETDATE())) and id in (select orderid from Order_Details where productid in (select id from Product where shopid = (select id from Shop where ownerid = ?)))";
+                    + "where MONTH(createdate) = MONTH(DATEADD(" + timeType.toUpperCase() + ", -1, GETDATE())) and id in (select orderid from Order_Details where productid in (select id from Product where shopid = (select id from Shop where ownerid = ?)))";
             PreparedStatement pst = cn.prepareStatement(sql);
             pst.setInt(1, ownerID);
             ResultSet rs = pst.executeQuery();
@@ -2637,11 +2930,10 @@ public class BirdPeeDAO {
     }
 
 // Get the growing revenue percentage of order by time type
-    public static float SHOPOWNER_getGrowingPricePercentage(int ownerID, String timeType) throws Exception {
+    public static float SHOPOWNER_getGrowingPricePercentage(int ownerID) throws Exception {
         float result = 0;
-        timeType = timeType.toUpperCase();
-        float present = SHOPOWNER_getAmountPricePresent(ownerID, timeType);
-        float past = SHOPOWNER_getAmountPricePast(ownerID, timeType);
+        float present = SHOPOWNER_getAmountPricePresent(ownerID);
+        float past = SHOPOWNER_getAmountPricePast(ownerID);
         if (past == 0) {
             past = 1;
         }
@@ -2650,16 +2942,21 @@ public class BirdPeeDAO {
     }
 
     //--- Get amount revenue of present time type
-    public static float SHOPOWNER_getAmountPricePresent(int ownerID, String timeType) throws Exception {
+    public static float SHOPOWNER_getAmountPricePresent(int shopID) throws Exception {
         float result = 0;
         Connection cn = DBUtils.getConnection();
 
         if (cn != null) {
-            String sql = "select SUM(initprice)\n"
-                    + "from Order_Details, Orders\n"
-                    + "where orderid = Orders.id and " + timeType + "(createdate) = " + timeType + "(GETDATE()) and productid in (select id from Product where shopid = (select id from Shop where ownerid = ?))";
+            String sql = "select sum(initprice * quantity)\n"
+                    + "from Order_Details\n"
+                    + "where orderid in (select distinct orderid from Order_Details, Orders \n"
+                    + "where productid in (select id from Product where shopid = ?)\n"
+                    + "and orderid = Orders.id\n"
+                    + "and Orders.status = 5\n"
+                    + "and MONTH(createdate) = MONTH(GETDATE())\n"
+                    + "and YEAR(createdate) = YEAR(GETDATE()))";
             PreparedStatement pst = cn.prepareStatement(sql);
-            pst.setInt(1, ownerID);
+            pst.setInt(1, shopID);
             ResultSet rs = pst.executeQuery();
             if (rs != null && rs.next()) {
                 result = rs.getFloat(1);
@@ -2670,16 +2967,21 @@ public class BirdPeeDAO {
     }
 
     //--- Get amount revenue of past time type
-    private static float SHOPOWNER_getAmountPricePast(int ownerID, String timeType) throws Exception {
+    private static float SHOPOWNER_getAmountPricePast(int shopID) throws Exception {
         float result = 0;
         Connection cn = DBUtils.getConnection();
 
         if (cn != null) {
-            String sql = "select SUM(initprice)\n"
-                    + "from Order_Details, Orders\n"
-                    + "where orderid = Orders.id and " + timeType + "(createdate) = " + timeType + "(DATEADD(" + timeType.toLowerCase() + ", -1, GETDATE())) and productid in (select id from Product where shopid = (select id from Shop where ownerid = ?))";
+            String sql = "select sum(initprice * quantity)\n"
+                    + "from Order_Details\n"
+                    + "where orderid in (select distinct orderid from Order_Details, Orders \n"
+                    + "where productid in (select id from Product where shopid = ?)\n"
+                    + "and orderid = Orders.id\n"
+                    + "and Orders.status = 5\n"
+                    + "and MONTH(createdate) = MONTH(DATEADD(month, -1, GETDATE()))\n"
+                    + "and YEAR(createdate) = YEAR(DATEADD(month, -1, GETDATE())))";
             PreparedStatement pst = cn.prepareStatement(sql);
-            pst.setInt(1, ownerID);
+            pst.setInt(1, shopID);
             ResultSet rs = pst.executeQuery();
             if (rs != null && rs.next()) {
                 result = rs.getFloat(1);
@@ -2690,81 +2992,97 @@ public class BirdPeeDAO {
     }
 
 // Product sold bar chart
-    public static ArrayList<String> SHOPOWNER_productSoldBarChart(int ownerID, int timeAmount, String timeType, String timeType2) throws Exception {
+    public static ArrayList<String> SHOPOWNER_productSoldBarChart(int shopID, int timeAmount) throws Exception {
         ArrayList<String> date = new ArrayList<>();
-        timeType = timeType.toUpperCase();
+
+        for (int i = 0; i < timeAmount; i++) {
+            int month = Integer.parseInt(SHOPOWNER_getTime(-i).split("@")[0]);
+            int year = Integer.parseInt(SHOPOWNER_getTime(-i).split("@")[1]);
+            date.add(SHOPOWNER_getTime(-i) + "@" + SHOPOWNER_getOrder(shopID, month, year));
+        }
+
+        return date;
+    }
+
+    //--- Get time
+    private static String SHOPOWNER_getTime(int timeAmount) throws Exception {
+        String date = "";
         Connection cn = DBUtils.getConnection();
 
         if (cn != null) {
-            for (int i = 0; i < timeAmount; i++) {
-                String sql = "select " + timeType + "(DATEADD(" + timeType.toLowerCase() + ", ?, GETDATE())), " + timeType2 + "(DATEADD(" + timeType.toLowerCase() + ", ?, GETDATE())), COUNT(productid)\n"
-                        + "from Order_Details, Orders\n"
-                        + "where " + timeType + "(DATEADD(" + timeType.toLowerCase() + ", ?, GETDATE())) = " + timeType + "(createdate)\n"
-                        + "and orderid = Orders.id and productid in (select id from Product where shopid = (select id from Shop where ownerid = ?))\n"
-                        + "order by COUNT(productid) desc";
-                PreparedStatement pst = cn.prepareStatement(sql);
-                pst.setInt(1, -i);
-                pst.setInt(2, -i);
-                pst.setInt(3, -i);
-                pst.setInt(4, ownerID);
-                ResultSet rs = pst.executeQuery();
-                if (rs != null && rs.next()) {
-                    date.add(rs.getInt(1) + "@" + rs.getInt(2) + "@" + rs.getInt(3));
-                } else {
-                    sql = "select " + timeType + "(DATEADD(" + timeType.toLowerCase() + ", ?, GETDATE())), " + timeType2 + "(DATEADD(" + timeType.toLowerCase() + ", ?, GETDATE())), 0\n"
-                            + "from Order_Details, Orders\n"
-                            + "where orderid = Orders.id and productid in (select id from Product where shopid = (select id from Shop where ownerid = ?))\n"
-                            + "order by COUNT(productid) desc";
-                    pst = cn.prepareStatement(sql);
-                    pst.setInt(1, -i);
-                    pst.setInt(2, -i);
-                    pst.setInt(3, ownerID);
-                    rs = pst.executeQuery();
-                    if (rs != null && rs.next()) {
-                        date.add(rs.getInt(1) + "@" + rs.getInt(2) + "@" + rs.getInt(3));
-                    }
-                }
+            String sql = "select MONTH(DATEADD(month, ?, GETDATE())), YEAR(DATEADD(month, ?, GETDATE()))";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, timeAmount);
+            pst.setInt(2, timeAmount);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null && rs.next()) {
+                date = rs.getInt(1) + "@" + rs.getInt(2);
             }
             cn.close();
         }
         return date;
     }
 
-// Revenue bar chart
-    public static ArrayList<String> SHOPOWNER_revenueBarChart(int ownerID, int timeAmount, String timeType, String timeType2) throws Exception {
-        ArrayList<String> revenue = new ArrayList<>();
-        timeType = timeType.toUpperCase();
+    //--- get order
+    private static int SHOPOWNER_getOrder(int shopID, int month, int year) throws Exception {
+        int count = 0;
         Connection cn = DBUtils.getConnection();
 
         if (cn != null) {
-            for (int i = 0; i < timeAmount; i++) {
-                String sql = "select " + timeType + "(DATEADD(" + timeType.toLowerCase() + ", ?, GETDATE())), " + timeType2 + "(DATEADD(" + timeType.toLowerCase() + ", ?, GETDATE())), SUM(initprice)\n"
-                        + "from Order_Details, Orders\n"
-                        + "where " + timeType + "(DATEADD(" + timeType.toLowerCase() + ", ?, GETDATE())) = " + timeType + "(createdate)\n"
-                        + "and orderid = Orders.id and productid in (select id from Product where shopid = (select id from Shop where ownerid = ?))\n"
-                        + "group by " + timeType + "(createdate)";
-                PreparedStatement pst = cn.prepareStatement(sql);
-                pst.setInt(1, -i);
-                pst.setInt(2, -i);
-                pst.setInt(3, -i);
-                pst.setInt(4, ownerID);
-                ResultSet rs = pst.executeQuery();
-                if (rs != null && rs.next()) {
-                    revenue.add(rs.getInt(1) + "@" + rs.getInt(2) + "@" + rs.getInt(3));
-                } else {
-                    sql = "select " + timeType + "(DATEADD(" + timeType.toLowerCase() + ", ?, GETDATE())), " + timeType2 + "(DATEADD(" + timeType.toLowerCase() + ", ?, GETDATE())), 0\n"
-                            + "from Order_Details, Orders\n"
-                            + "where orderid = Orders.id and productid in (select id from Product where shopid = (select id from Shop where ownerid = ?))\n"
-                            + "group by " + timeType + "(createdate)";
-                    pst = cn.prepareStatement(sql);
-                    pst.setInt(1, -i);
-                    pst.setInt(2, -i);
-                    pst.setInt(3, ownerID);
-                    rs = pst.executeQuery();
-                    if (rs != null && rs.next()) {
-                        revenue.add(rs.getInt(1) + "@" + rs.getInt(2) + "@" + rs.getInt(3));
-                    }
+            String sql = "select distinct Orders.id\n"
+                    + "from Orders, Order_Details\n"
+                    + "where status = 5\n"
+                    + "and MONTH(createdate) = ? and YEAR(createdate) = ?\n"
+                    + "and Orders.id in (select orderid from Order_Details where productid in (select id from Product where shopid = ?))";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, month);
+            pst.setInt(2, year);
+            pst.setInt(3, shopID);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    count++;
                 }
+            }
+            cn.close();
+        }
+        return count;
+    }
+
+// Revenue bar chart
+    public static ArrayList<String> SHOPOWNER_revenueBarChart(int shopID, int timeAmount) throws Exception {
+        ArrayList<String> revenue = new ArrayList<>();
+
+        for (int i = 0; i < timeAmount; i++) {
+            int month = Integer.parseInt(SHOPOWNER_getTime(-i).split("@")[0]);
+            int year = Integer.parseInt(SHOPOWNER_getTime(-i).split("@")[1]);
+            revenue.add(SHOPOWNER_getTime(-i) + "@" + SHOPOWNER_getRevenue(shopID, month, year));
+        }
+
+        return revenue;
+    }
+
+    //--- get revenue
+    private static long SHOPOWNER_getRevenue(int shopID, int month, int year) throws Exception {
+        long revenue = 0;
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select sum(initprice * quantity)\n"
+                    + "from Order_Details\n"
+                    + "where orderid in (select distinct orderid from Order_Details, Orders \n"
+                    + "where productid in (select id from Product where shopid = ?)\n"
+                    + "and orderid = Orders.id\n"
+                    + "and Orders.status = 5\n"
+                    + "and MONTH(createdate) = ?\n"
+                    + "and YEAR(createdate) = ?)";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, shopID);
+            pst.setInt(2, month);
+            pst.setInt(3, year);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null && rs.next()) {
+                revenue = rs.getLong(1);
             }
             cn.close();
         }
@@ -2772,17 +3090,17 @@ public class BirdPeeDAO {
     }
 
 // Hot product chart
-    public static ArrayList<String> SHOPOWNER_hotProductBarChart(int ownerID) throws Exception {
+    public static ArrayList<String> SHOPOWNER_hotProductBarChart(int shopID) throws Exception {
         ArrayList<String> hotProduct = new ArrayList<>();
         Connection cn = DBUtils.getConnection();
 
         if (cn != null) {
             String sql = "select top 10 id, soldQuantity\n"
                     + "from Product\n"
-                    + "where shopid = (select id from Shop where ownerid = ?)\n"
+                    + "where shopid = ?\n"
                     + "order by soldQuantity desc";
             PreparedStatement pst = cn.prepareStatement(sql);
-            pst.setInt(1, ownerID);
+            pst.setInt(1, shopID);
             ResultSet rs = pst.executeQuery();
             if (rs != null) {
                 while (rs.next()) {
@@ -2801,10 +3119,10 @@ public class BirdPeeDAO {
 
         if (cn != null) {
             for (int i = 1; i <= 5; i++) {
-                String sql = "select count(Order_Details.id), Order_Status.status\n"
-                        + "from Order_Details, Orders, Order_Status\n"
-                        + "where Orders.status = ? and Orders.status = Order_Status.id and orderid = Orders.id and productid in (select id from Product where shopid = ?)\n"
-                        + "group by Order_Status.status";
+                String sql = "select COUNT(id), status\n"
+                        + "from Orders\n"
+                        + "where status = ? and id in (select orderid from Order_Details where productid in (select id from Product where shopid = ?))\n"
+                        + "group by status";
                 PreparedStatement pst = cn.prepareStatement(sql);
                 pst.setInt(1, i);
                 pst.setInt(2, shopID);
@@ -3116,41 +3434,48 @@ public class BirdPeeDAO {
         Connection cn = DBUtils.getConnection();
         ArrayList<Customer> listC = new ArrayList<>();
         String sql = "";
+        System.out.println(key + type);
 
         if (cn != null) {
             if (key.isEmpty()) {
-                sql = "select name, email, gender, tel, DoB, Customer.id, status, username, password, role, img, isDobSetup\n"
+                sql = "select name, email, gender, tel, DoB, Customer.id, Account.status, username, password, role, img, isDobSetup\n"
                         + "from Customer, Account\n"
-                        + "where Customer.id = Account.id\n"
-                        + "and Customer.id in (select customerid from Orders where id in (select orderid from Order_Details where productid in (select productid from Shop where id = ?)))";
+                        + "where Customer.id = Account.id and Customer.id in (select customerid from Orders where id in\n"
+                        + "(select orderid from Order_Details where productid in\n"
+                        + "(select id from Product where shopid = ?)))";
             } else {
                 switch (type) {
                     case "mail":
                         sql = "select name, email, gender, tel, DoB, Customer.id, status, username, password, role, img, isDobSetup\n"
                                 + "from Customer, Account\n"
-                                + "where Customer.id = Account.id\n"
-                                + "and Customer.id in (select customerid from Orders where id in (select orderid from Order_Details where productid in (select productid from Shop where id = ?)))\n"
-                                + "and email like ?";
+                                + "where email like ?\n"
+                                + "and Customer.id = Account.id and Customer.id in (select customerid from Orders where id in\n"
+                                + "(select orderid from Order_Details where productid in\n"
+                                + "(select id from Product where shopid = ?)))";
                         break;
                     case "phone":
                         sql = "select name, email, gender, tel, DoB, Customer.id, status, username, password, role, img, isDobSetup\n"
                                 + "from Customer, Account\n"
-                                + "where Customer.id = Account.id\n"
-                                + "and Customer.id in (select customerid from Orders where id in (select orderid from Order_Details where productid in (select productid from Shop where id = ?)))\n"
-                                + "and tel like ?";
+                                + "where tel like ?\n"
+                                + "and Customer.id = Account.id and Customer.id in (select customerid from Orders where id in\n"
+                                + "(select orderid from Order_Details where productid in\n"
+                                + "(select id from Product where shopid = ?)))";
                         break;
                 }
             }
 
             PreparedStatement pst = cn.prepareStatement(sql);
-            pst.setInt(1, shopID);
             if (!key.isEmpty()) {
-                pst.setString(2, "%" + key + "%");
+                pst.setString(1, "%" + key.trim() + "%");
+                pst.setInt(2, shopID);
+            } else {
+                pst.setInt(1, shopID);
             }
             ResultSet rs = pst.executeQuery();
             if (rs != null) {
                 while (rs.next()) {
-                    listC.add(new Customer(rs.getString(1),
+                    listC.add(new Customer(
+                            rs.getString(1),
                             rs.getString(2),
                             rs.getString(3),
                             rs.getString(4),
@@ -3161,7 +3486,8 @@ public class BirdPeeDAO {
                             rs.getString(9),
                             rs.getString(10),
                             rs.getString(11),
-                            rs.getInt(12)));
+                            rs.getInt(12)
+                    ));
                 }
             }
             cn.close();
@@ -3220,11 +3546,645 @@ public class BirdPeeDAO {
             cn.close();
         }
     }
+
+// Get owner name by owner id
+    public static String SHOPOWNER_getOwnerName(int ownerID) throws Exception {
+        String ownerName = "";
+        Connection cn = DBUtils.getConnection();
+        if (cn != null) {
+            String sql = "select username from Account\n"
+                    + "where id = ?";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, ownerID);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null && rs.next()) {
+                ownerName = rs.getString(1);
+            }
+        }
+        return ownerName;
+    }
+
+// update shop account
+    public static void SHOPOWNER_updateAccount(String pass, int accID) throws Exception {
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "update Account\n"
+                    + "set\n"
+                    + "password = ?\n"
+                    + "where id = ?";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setString(1, pass);
+            pst.setInt(2, accID);
+            pst.executeUpdate();
+            cn.close();
+        }
+    }
+
+// Send email
+    public static void SHOPOWNER_sendEmail(int sid, int cid, int oid) throws Exception {
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "insert into Shop_OrderMail(orderid, shopid, customerid)\n"
+                    + "values(?,?,?)";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, oid);
+            pst.setInt(2, sid);
+            pst.setInt(3, cid);
+            pst.executeUpdate();
+            cn.close();
+        }
+    }
+
+// Check sent mail
+    public static boolean SHOPOWNER_checkEmail(int sid, int cid, int oid) throws Exception {
+
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select id from Shop_OrderMail\n"
+                    + "where orderid = ?\n"
+                    + "and shopid = ?\n"
+                    + "and customerid = ?";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, oid);
+            pst.setInt(2, sid);
+            pst.setInt(3, cid);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null && rs.next()) {
+                return true;
+            }
+            cn.close();
+        }
+        return false;
+    }
+
 //-----//
 //-----//
 //----------------------------- ADMIN -----------------------------//
 //-----//
 //-----//
+// Get all shops in web
+    public static ArrayList<Shop> ADMIN_getAllShops() throws Exception {
+        ArrayList<Shop> listS = new ArrayList<>();
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select id, ownerid, name, img, description, createdate from Shop";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    listS.add(new Shop(
+                            rs.getInt(1),
+                            rs.getInt(2),
+                            rs.getString(3),
+                            rs.getString(4),
+                            rs.getString(5),
+                            DATESTRINGCONVERTER_convertSQLDatetoUtilDate(rs.getDate(6))
+                    ));
+                }
+            }
+            cn.close();
+        }
+        return listS;
+    }
+
+// Get all shops in web after search
+    public static ArrayList<Shop> ADMIN_getAllShopsSearch(String key) throws Exception {
+        ArrayList<Shop> listS = new ArrayList<>();
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select id, ownerid, name, img, description, createdate from Shop where name like ?";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setString(1, "%" + key + "%");
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    listS.add(new Shop(
+                            rs.getInt(1),
+                            rs.getInt(2),
+                            rs.getString(3),
+                            rs.getString(4),
+                            rs.getString(5),
+                            DATESTRINGCONVERTER_convertSQLDatetoUtilDate(rs.getDate(6))
+                    ));
+                }
+            }
+            cn.close();
+        }
+        return listS;
+    }
+
+// Get all shops in web after sort
+    public static ArrayList<Shop> ADMIN_getAllShopsSort(String sort) throws Exception {
+        ArrayList<Shop> listS = new ArrayList<>();
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "";
+            switch (sort) {
+                case "Revenue":
+                    sql = "select s.id, ownerid, s.name, img, s.description, createdate, SUM(o.initprice) as revenue\n"
+                            + "from Shop s\n"
+                            + "Join Product p on p.shopid = s.id\n"
+                            + "join Order_Details o on p.id = o.productid\n"
+                            + "group by s.id, ownerid, s.name, img, s.description, createdate\n"
+                            + "order by revenue desc";
+                    break;
+                case "Rating":
+                    sql = "select s.id, ownerid, s.name, img, s.description, createdate, ROUND(AVG(f.rating), 0, 1) as rating\n"
+                            + "from Shop s\n"
+                            + "Join Product p on p.shopid = s.id\n"
+                            + "join Feedback f on p.id = f.productid\n"
+                            + "group by s.id, ownerid, s.name, img, s.description, createdate\n"
+                            + "order by rating desc";
+                    break;
+                case "Active":
+                    sql = "select s.id, ownerid, s.name, s.img, s.description, createdate\n"
+                            + "from Shop s, Account a\n"
+                            + "where ownerid = a.id and a.status = 1";
+                    break;
+                case "Banned":
+                    sql = "select s.id, ownerid, s.name, s.img, s.description, createdate\n"
+                            + "from Shop s, Account a\n"
+                            + "where ownerid = a.id and a.status = 0";
+                    break;
+            }
+
+            PreparedStatement pst = cn.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    listS.add(new Shop(
+                            rs.getInt(1),
+                            rs.getInt(2),
+                            rs.getString(3),
+                            rs.getString(4),
+                            rs.getString(5),
+                            DATESTRINGCONVERTER_convertSQLDatetoUtilDate(rs.getDate(6))
+                    ));
+                }
+            }
+            if (sort.equalsIgnoreCase("Rating") || sort.equalsIgnoreCase("Revenue")) {
+                ArrayList<Shop> listTmp = ADMIN_getAllShops();
+                for (Shop shop : listTmp) {
+                    int flag = 0;
+                    for (Shop s : listS) {
+                        if (s.getId() == shop.getId()) {
+                            flag = 1;
+                            break;
+                        }
+                    }
+                    if (flag == 0) {
+                        listS.add(shop);
+                    }
+                }
+            }
+            cn.close();
+        }
+        return listS;
+    }
+
+// Get all product in web
+    public static ArrayList<Product> ADMIN_getAllProducts() throws Exception {
+        ArrayList<Product> listP = new ArrayList<>();
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select soldQuantity, availableQuantity, cateid, isDiscount, shopid, id, name, description, price from Product";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    listP.add(new Product(
+                            rs.getInt(1),
+                            rs.getInt(2),
+                            rs.getInt(3),
+                            rs.getInt(4),
+                            rs.getInt(5),
+                            rs.getInt(6),
+                            rs.getString(7),
+                            rs.getString(8),
+                            rs.getFloat(9)
+                    ));
+                }
+            }
+            cn.close();
+        }
+        return listP;
+    }
+
+// Get all report in web
+    public static ArrayList<Feedback> ADMIN_getAllReports() throws Exception {
+        ArrayList<Feedback> listR = new ArrayList<>();
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select id, comment, date, customerid, productid, status from Feedback where isReported = 1";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    listR.add(new Feedback(
+                            rs.getInt(1),
+                            rs.getString(2),
+                            -1,
+                            DATESTRINGCONVERTER_convertSQLDatetoUtilDate(rs.getDate(3)),
+                            rs.getInt(4),
+                            rs.getInt(5),
+                            "",
+                            0,
+                            -1
+                    ));
+                }
+            }
+            cn.close();
+        }
+        return listR;
+    }
+
+// Get all report in web search
+    public static ArrayList<Feedback> ADMIN_getAllReportsSearch(String key) throws Exception {
+        ArrayList<Feedback> listR = new ArrayList<>();
+        int id = ADMIN_getReportShopID(key);
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select id, comment, date, customerid, productid, status from Feedback where isReported = 1 and productid in (select id from Product where shopid = ?)";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, id);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    listR.add(new Feedback(
+                            rs.getInt(1),
+                            rs.getString(2),
+                            -1,
+                            DATESTRINGCONVERTER_convertSQLDatetoUtilDate(rs.getDate(3)),
+                            rs.getInt(4),
+                            rs.getInt(5),
+                            "",
+                            0,
+                            -1
+                    ));
+                }
+            }
+            cn.close();
+        }
+        return listR;
+    }
+
+    //--- Get shop id
+    private static int ADMIN_getReportShopID(String key) throws Exception {
+        int id = 0;
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select id from Shop where name like ?";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setString(1, "%" + key + "%");
+            ResultSet rs = pst.executeQuery();
+            if (rs != null && rs.next()) {
+                id = rs.getInt(1);
+            }
+            cn.close();
+        }
+        return id;
+    }
+
+// Get all customer in web
+    public static ArrayList<Customer> ADMIN_getAllCustomers() throws Exception {
+        ArrayList<Customer> listC = new ArrayList<>();
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select name, email, gender, tel, DoB, Customer.id, status, username, password, role, img, isDobSetup from Customer, Account where Account.id = Customer.id";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    listC.add(new Customer(
+                            rs.getString(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            rs.getString(4),
+                            DATESTRINGCONVERTER_convertSQLDatetoUtilDate(rs.getDate(5)),
+                            rs.getInt(6),
+                            rs.getInt(7),
+                            rs.getString(8),
+                            rs.getString(9),
+                            rs.getString(10),
+                            rs.getString(11),
+                            rs.getInt(12)
+                    ));
+                }
+            }
+            cn.close();
+        }
+        return listC;
+    }
+
+// Get all customer in web searcch
+    public static ArrayList<Customer> ADMIN_getAllCustomersSearch(String key) throws Exception {
+        ArrayList<Customer> listC = new ArrayList<>();
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select name, email, gender, tel, DoB, Customer.id, status, username, password, role, img, isDobSetup from Customer, Account where where Account.id = Customer.id and name like ?";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setString(1, "%" + key + "%");
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    listC.add(new Customer(
+                            rs.getString(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            rs.getString(4),
+                            DATESTRINGCONVERTER_convertSQLDatetoUtilDate(rs.getDate(5)),
+                            rs.getInt(6),
+                            rs.getInt(7),
+                            rs.getString(8),
+                            rs.getString(9),
+                            rs.getString(10),
+                            rs.getString(11),
+                            rs.getInt(12)
+                    ));
+                }
+            }
+            cn.close();
+        }
+        return listC;
+    }
+
+// Get all customer in web sort
+    public static ArrayList<Customer> ADMIN_getAllCustomersSort(String sort) throws Exception {
+        ArrayList<Customer> listC = new ArrayList<>();
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "";
+            switch (sort) {
+                case "Active":
+                    sql = "select name, email, gender, tel, DoB, Customer.id, status, username, password, role, img, isDobSetup from Customer, Account where Account.id = Customer.id and status = 1";
+                    break;
+                case "Banned":
+                    sql = "select name, email, gender, tel, DoB, Customer.id, status, username, password, role, img, isDobSetup from Customer, Account where Account.id = Customer.id and status = 0";
+                    break;
+            }
+            PreparedStatement pst = cn.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null) {
+                while (rs.next()) {
+                    listC.add(new Customer(
+                            rs.getString(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            rs.getString(4),
+                            DATESTRINGCONVERTER_convertSQLDatetoUtilDate(rs.getDate(5)),
+                            rs.getInt(6),
+                            rs.getInt(7),
+                            rs.getString(8),
+                            rs.getString(9),
+                            rs.getString(10),
+                            rs.getString(11),
+                            rs.getInt(12)
+                    ));
+                }
+            }
+            cn.close();
+        }
+        return listC;
+    }
+
+// Shop revenue bar chart
+    public static ArrayList<String> ADMIN_shopRevenueBarChart() throws Exception {
+        ArrayList<String> listSR = new ArrayList<>();
+        ArrayList<Shop> listS = ADMIN_getAllShops();
+
+        for (Shop s : listS) {
+            listSR.add(s.getName() + "@" + ADMIN_getShopRevenue(s.getId()));
+        }
+        for (int i = 0; i < listSR.size(); i++) {
+            for (int j = i + 1; j < listSR.size(); j++) {
+                if (Float.parseFloat(listSR.get(i).split("@")[1]) < Float.parseFloat(listSR.get(j).split("@")[1])) {
+                    String tmp = listSR.get(i).trim();
+                    listSR.set(i, listSR.get(j).trim());
+                    listSR.set(j, tmp);
+                }
+            }
+        }
+        return listSR;
+    }
+
+    //--- Get revenue of shop by shop id
+    private static float ADMIN_getShopRevenue(int shopID) throws Exception {
+        float revenue = 0;
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select SUM(initprice) from Order_Details, Orders\n"
+                    + "where productid in (select id from Product where shopid = ?) and orderid = Orders.id and MONTH(createdate) = MONTH(GETDATE())";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, shopID);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null && rs.next()) {
+                revenue = rs.getFloat(1);
+            }
+            cn.close();
+        }
+        return revenue;
+    }
+
+// Product category bar chart
+    public static ArrayList<String> ADMIN_productCategoryBarChart() throws Exception {
+        ArrayList<String> listPC = new ArrayList<>();
+        ArrayList<Category> listC = CATEGORY_getAllCate();
+        for (Category c : listC) {
+            listPC.add(c.getName() + "@" + ADMIN_getProductAmountEachCate(c.getId()));
+        }
+        return listPC;
+    }
+
+    //--- Get product amout in category
+    private static int ADMIN_getProductAmountEachCate(int cateID) throws Exception {
+        int amount = 0;
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select COUNT(id) from Product where cateid = ?";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, cateID);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null && rs.next()) {
+                amount = rs.getInt(1);
+            }
+            cn.close();
+        }
+        return amount;
+    }
+
+// Shop report bar chart
+    public static ArrayList<String> ADMIN_shopReportBarChart() throws Exception {
+        ArrayList<String> listSBR = new ArrayList<>();
+        ArrayList<Shop> listS = ADMIN_getAllShops();
+
+        for (Shop s : listS) {
+            listSBR.add(s.getName() + "@" + ADMIN_getShopReport(s.getId()));
+        }
+        return listSBR;
+    }
+
+    //--- Get report of shop by shop id
+    private static int ADMIN_getShopReport(int shopID) throws Exception {
+        int reportAmount = 0;
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select COUNT(id) from Feedback \n"
+                    + "where isReported = 1 and productid in (select id from Product where shopid = ?)";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, shopID);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null && rs.next()) {
+                reportAmount = rs.getInt(1);
+            }
+            cn.close();
+        }
+        return reportAmount;
+    }
+
+// Count shop join by month
+    public static ArrayList<String> ADMIN_ShopJoinBarChart() throws Exception {
+        ArrayList<String> listS = new ArrayList<>();
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            for (int i = 0; i < 6; i++) {
+                String sql = "select MONTH(DATEADD(month, ?, GETDATE())), COUNT(id) \n"
+                        + "from Shop \n"
+                        + "where MONTH(createdate) = MONTH(DATEADD(month, ?, GETDATE()))";
+                PreparedStatement pst = cn.prepareStatement(sql);
+                pst.setInt(1, -i);
+                pst.setInt(2, -i);
+                ResultSet rs = pst.executeQuery();
+                if (rs != null && rs.next()) {
+                    listS.add(rs.getInt(1) + "@" + rs.getInt(2));
+                }
+            }
+
+            cn.close();
+        }
+        return listS;
+    }
+
+// Get owner account
+    public static Account ADMIN_getShopOwnerAccount(int ownerID) throws Exception {
+        Account ac = new Account();
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "select id, status, username, password, role, img \n"
+                    + "from Account\n"
+                    + "where role = 'SO' and id = ?";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, ownerID);
+            ResultSet rs = pst.executeQuery();
+            if (rs != null && rs.next()) {
+                ac = new Account(
+                        rs.getInt(1),
+                        rs.getInt(2),
+                        rs.getString(3),
+                        rs.getString(4),
+                        rs.getString(5),
+                        rs.getString(6)
+                );
+            }
+            cn.close();
+        }
+        return ac;
+    }
+
+// Update shop owner status
+    public static void ADMIN_updateSOStatus(int newStatus, int ownerID) throws Exception {
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "update Account\n"
+                    + "set status = ?\n"
+                    + "where id = ?";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, newStatus);
+            pst.setInt(2, ownerID);
+            pst.executeUpdate();
+            cn.close();
+        }
+    }
+
+// Update customer  status
+    public static void ADMIN_updateCSStatus(int newStatus, int customerID) throws Exception {
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "update Account\n"
+                    + "set status = ?\n"
+                    + "where id = ?";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setInt(1, newStatus);
+            pst.setInt(2, customerID);
+            pst.executeUpdate();
+            cn.close();
+        }
+    }
+
+// Create SO account
+    public static void ADMIN_createSOAccount(String username, String password, String role, int status, String img) throws Exception {
+        ADMIN_createAccount(username, password, role, status, img);
+        ADMIN_createDefaultShop(username, password);
+    }
+
+    //--- Create account
+    private static void ADMIN_createAccount(String username, String password, String role, int status, String img) throws Exception {
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "insert into Account (username, password, role, status, img)\n"
+                    + "values (?,?,?,?,?)";
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setString(1, username);
+            pst.setString(2, password);
+            pst.setString(3, role);
+            pst.setInt(4, status);
+            pst.setString(5, img);
+            pst.executeUpdate();
+            cn.close();
+        }
+    }
+
+    //--- Get created account 
+    private static int ADMIN_getLastestSOAccountID(String username, String password) throws Exception {
+        return ACCOUNT_checkExistedAccountByNamePass(username, password).getId();
+    }
+
+    //--- Create default shop
+    private static void ADMIN_createDefaultShop(String username, String password) throws Exception {
+        int accID = ADMIN_getLastestSOAccountID(username, password);
+        Connection cn = DBUtils.getConnection();
+
+        if (cn != null) {
+            String sql = "insert into Shop(districtid, name, img, description, ownerid, createdate)\n"
+                    + "values(1389, ?, ?, 'No description for this shop', ?, GETDATE())";//1389 is Thu Duc, HCM
+            PreparedStatement pst = cn.prepareStatement(sql);
+            pst.setString(1, username);
+            pst.setString(2, "images/Bird pic.png");
+            pst.setInt(3, accID);
+            pst.executeUpdate();
+            cn.close();
+        }
+    }
 //-----//
 //-----//
 }

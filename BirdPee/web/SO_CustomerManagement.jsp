@@ -47,7 +47,7 @@
 
             <div class="user-info">
                 <img src="https://cdn-icons-png.flaticon.com/512/552/552721.png" alt="" />
-                <h3><%= ac.getUsername()%></h3>
+                <h3><%= ac.getUsername().split("#")[1] %></h3>
             </div>
 
             <div class="sidebar">
@@ -71,13 +71,13 @@
                             </a>
                         </li>
                         <li class="list">
-                            <a href="SO_CustomerManagement.jsp" class="nav-link">
+                            <a href="SO_CustomerManagement.jsp" class="nav-link active">
                                 <i class="icon bx bxs-package"></i>
                                 <span class="link">CUSTOMER MANAGEMENT</span>
                             </a>
                         </li>
                         <li class="list">
-                            <a href="SO_ShopProfileManagement.jsp?provinceid=<%= BirdPeeDAO.SHIP_getProvinceIDByShopID(s.getId()).trim()%>&districtid=<%= BirdPeeDAO.SHIP_getDistrictIDByShopID(s.getId()).trim()%>" class="nav-link active">
+                            <a href="SO_ShopProfileManagement.jsp?provinceid=<%= BirdPeeDAO.SHIP_getProvinceIDByShopID(s.getId()).trim()%>&districtid=<%= BirdPeeDAO.SHIP_getDistrictIDByShopID(s.getId()).trim()%>" class="nav-link">
                                 <i class="bx bxs-store-alt icon"></i>
                                 <span class="link">SHOP PROFILE</span>
                             </a>

@@ -46,7 +46,7 @@
 
             <div class="user-info">
                 <img src="https://cdn-icons-png.flaticon.com/512/552/552721.png" alt="" />
-                <h3><%= ac.getUsername()%></h3>
+                <h3><%= ac.getUsername().split("#")[1] %></h3>
             </div>
 
             <div class="sidebar">
@@ -136,9 +136,9 @@
                 </div>
                 <div class="card-single">
                     <div>
-                        <h3><%= String.format("%,.0f", BirdPeeDAO.SHOPOWNER_getAmountPricePresent(ac.getId(), "MONTH"))%> VND</h3>
+                        <h3><%= String.format("%,.0f", BirdPeeDAO.SHOPOWNER_getAmountPricePresent(s.getId()))%> VND</h3>
                         <span>Income</span>
-                        <p class="<%= BirdPeeDAO.SHOPOWNER_getGrowingPricePercentage(ac.getId(), "MONTH") > 0 ? "plus" : "minus"%>"><%= BirdPeeDAO.SHOPOWNER_getGrowingPricePercentage(ac.getId(), "MONTH") > 0 ? "+" : ""%><%= String.format("%.2f", BirdPeeDAO.SHOPOWNER_getGrowingPricePercentage(ac.getId(), "MONTH"))%>%</p>
+                        <p class="<%= BirdPeeDAO.SHOPOWNER_getGrowingPricePercentage(s.getId()) > 0 ? "plus" : "minus"%>"><%= BirdPeeDAO.SHOPOWNER_getGrowingPricePercentage(s.getId()) > 0 ? "+" : ""%><%= String.format("%.2f", BirdPeeDAO.SHOPOWNER_getGrowingPricePercentage(s.getId()))%>%</p>
                     </div>
                     <div>
                         <i class="fas fa-solid fa-money-bill-1-wave" style="color: green"></i>
@@ -177,7 +177,7 @@
 
         <!--        Sold product chart       -->
         <%//
-            ArrayList<String> productSoldBC = BirdPeeDAO.SHOPOWNER_productSoldBarChart(ac.getId(), 5, "MONTH", "YEAR");
+            ArrayList<String> productSoldBC = BirdPeeDAO.SHOPOWNER_productSoldBarChart(s.getId(), 5);
             for (int i = 0; i < productSoldBC.size(); i++) {
                 String date = BirdPeeDAO.SHOPOWNER_changeToMonth(Integer.parseInt(productSoldBC.get(i).split("@")[0])) + ", " + productSoldBC.get(i).split("@")[1];
                 String data = productSoldBC.get(i).split("@")[2];
@@ -192,7 +192,7 @@
 
         <!--        Revenue chart       -->
         <%
-            ArrayList<String> revenueBC = BirdPeeDAO.SHOPOWNER_revenueBarChart(ac.getId(), 5, "MONTH", "YEAR");
+            ArrayList<String> revenueBC = BirdPeeDAO.SHOPOWNER_revenueBarChart(s.getId(), 5);
             for (int i = 0; i < revenueBC.size(); i++) {
                 String date = BirdPeeDAO.SHOPOWNER_changeToMonth(Integer.parseInt(revenueBC.get(i).split("@")[0])) + ", " + revenueBC.get(i).split("@")[1];
                 String data = revenueBC.get(i).split("@")[2];
@@ -207,7 +207,7 @@
 
         <!--      Hot product chart    -->
         <%
-            ArrayList<String> hotProductBC = BirdPeeDAO.SHOPOWNER_hotProductBarChart(ac.getId());
+            ArrayList<String> hotProductBC = BirdPeeDAO.SHOPOWNER_hotProductBarChart(s.getId());
             for (int i = 0; i < hotProductBC.size(); i++) {
                 String productName = hotProductBC.get(i).split("@")[0];
                 String data = hotProductBC.get(i).split("@")[1];

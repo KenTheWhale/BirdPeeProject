@@ -36,11 +36,21 @@
             if (session.getAttribute("productSort") != null) {// from ProductList.jsp
                 session.removeAttribute("productSort");
             }
+            if (session.getAttribute("productShopSubSort") != null) {// from ShopProfile.jsp
+                session.removeAttribute("productShopSubSort");
+            }
+            if (session.getAttribute("productShopSort") != null) {// from ShopProfile.jsp
+                session.removeAttribute("productShopSort");
+            }
             if (session.getAttribute("shipchoice") != null) {// from Success,jsp
                 session.removeAttribute("shipchoice");
             }
             if (session.getAttribute("total") != null) {// from Success,jsp
                 session.removeAttribute("total");
+            }
+            ArrayList<String> listN = new ArrayList<>();
+            if (ac != null) {
+                listN = BirdPeeDAO.ACCOUNT_getNotification(ac.getId());
             }
         %>
         <header>
@@ -77,7 +87,7 @@
                     </a>
                     <a href="<%= (ac == null) ? "Login.jsp" : "Notification.jsp"%>">
                         <li>
-                            <div class="header__icon_circle noti" current-count="0">
+                            <div class="header__icon_circle noti" current-count="<%= listN.size()%>">
                                 <i class="fas fa-solid fa-bell"></i>
                             </div>
                             <h4>Notification</h4>
@@ -177,11 +187,19 @@
                                     <p><%= name%></p> <!-- product name -->
                                 </div>
                                 <div class="rating-star">
+                                    <%
+                                        int rate = BirdPeeDAO.PRODUCT_getRatingByID(p.getId());
+                                        for (int i = 0; i < rate; i++) {
+                                    %>
                                     <i class="fa-solid fa-star" style="color: #ffd43b"></i>
-                                    <i class="fa-solid fa-star" style="color: #ffd43b"></i>
-                                    <i class="fa-solid fa-star" style="color: #ffd43b"></i>
-                                    <i class="fa-solid fa-star" style="color: #ffd43b"></i>
-                                    <i class="fa-solid fa-star" style="color: #ffd43b"></i>
+                                    <%
+                                        }
+                                        for (int i = 0; i < (5 - rate); i++) {
+                                    %>
+                                    <i class="fa-solid fa-star" style="color: gray"></i>
+                                    <%
+                                        }
+                                    %>
                                 </div>
                                 <div class="discount-tag">
                                     <span class="discount-percent"><%= String.format("%.0f", (1 - discountPrice) * 100)%>%</span>
@@ -243,7 +261,7 @@
                                         ><%= p.getSoldQuantity()%> Has Been Sold</p><!--Product sold quantity-->
                                 </div>
                                 <div class="price">
-                                    <span class="new-price" style="color: green"><%= String.format("%,.0f", p.getPrice())%> VND</span><!--Product base price-->
+                                    <span class="new-price" style="color: green"><%= String.format("%,.0f", BirdPeeDAO.PRODUCT_getProductDiscountOrNotByID(p.getId()))%> VND</span><!--Product base price-->
                                 </div>
                                 <img
                                     class="icon"

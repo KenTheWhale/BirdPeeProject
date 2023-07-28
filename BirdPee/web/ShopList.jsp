@@ -43,6 +43,16 @@
             if (session.getAttribute("total") != null) {// from Success,jsp
                 session.removeAttribute("total");
             }
+            if (session.getAttribute("productShopSubSort") != null) {// from ShopProfile.jsp
+                session.removeAttribute("productShopSubSort");
+            }
+            if (session.getAttribute("productShopSort") != null) {// from ShopProfile.jsp
+                session.removeAttribute("productShopSort");
+            }
+            ArrayList<String> listN = new ArrayList<>();
+            if(ac != null){
+                listN = BirdPeeDAO.ACCOUNT_getNotification(ac.getId());
+            }
         %>
         <header>
             <div class="header__logo">
@@ -74,7 +84,7 @@
                     </a>
                     <a href="<%= (ac == null) ? "Login.jsp" : "Notification.jsp"%>">
                         <li>
-                            <div class="header__icon_circle noti" current-count="0">
+                            <div class="header__icon_circle noti" current-count="<%= listN.size() %>">
                                 <i class="fas fa-solid fa-bell"></i>
                             </div>
                             <h4>Notification</h4>
@@ -135,7 +145,7 @@
                         for (Shop s : listS) {
                             String address = BirdPeeDAO.SHOP_getShopLocation(s.getId());
                 %>
-                <a href="#">
+                <a href="BirdPee?action=ViewShop&id=<%= s.getId() %>">
                     <div class="column">
                         <div class="item">
                             <div class="shop-left">
@@ -165,13 +175,6 @@
                                 </div>
                                 <div class="button-place">
                                     <button>View Shop</button>
-                                    <%
-                                        if (session.getAttribute("user") != null) {
-                                    %>
-                                    <button style="margin-top: 20px">Follow Shop</button>
-                                    <%
-                                        }
-                                    %>
                                 </div>
                             </div>
                         </div>

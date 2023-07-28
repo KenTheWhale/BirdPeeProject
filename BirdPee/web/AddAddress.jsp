@@ -26,6 +26,7 @@
             if (session.getAttribute("user") == null) {
                 response.sendRedirect("Login.jsp");
             } else {
+                ArrayList<String> listN = BirdPeeDAO.ACCOUNT_getNotification(ac.getId());
         %>
         <header>
             <div class="header__logo">
@@ -57,7 +58,7 @@
                     </a>
                     <a href="Notification.jsp">
                         <li>
-                            <div class="header__icon_circle noti" current-count="0">
+                            <div class="header__icon_circle noti" current-count="<%= listN.size() %>">
                                 <i class="fas fa-solid fa-bell"></i>
                             </div>
                             <h4>Notification</h4>

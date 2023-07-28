@@ -49,7 +49,7 @@
 
             <div class="user-info">
                 <img src="https://cdn-icons-png.flaticon.com/512/552/552721.png" alt="" />
-                <h3><%= ac.getUsername()%></h3>
+                <h3><%= ac.getUsername().split("#")[1] %></h3>
             </div>
 
             <div class="sidebar">

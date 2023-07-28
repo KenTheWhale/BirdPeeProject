@@ -5,9 +5,6 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
-::-webkit-scrollbar{
-    display: none;
-}
 
 body {
   background: #f5f5f5;

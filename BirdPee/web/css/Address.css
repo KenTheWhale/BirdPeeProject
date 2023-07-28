@@ -18,122 +18,137 @@
   a {
     text-decoration: none;
     color: black;
-    font-size: 15px;
   }
   
-  header {
-    background-color: #76a463;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    position: sticky;
-    left: 0;
-    top: 0;
-    height: 100px;
-    z-index: 999;
-    
-  }
-  
-  header .header__logo img {
-    margin-top: 20px;
-    height: 100px;
-  }
-  
-  header .header__search-bar {
-    width: 40%;
-    position: relative;
-  }
-  
-  header .header__search-bar input {
-    border-radius: 10px;
-    height: 40px;
-    width: 100%;
-    padding: 10px;
-    border: none;
-  }
-  
-  header .header__search-bar .nav {
-    display: flex;
-    justify-content: space-between;
-    padding-top: 20px;
-   
-  }
-  header .header__search-bar{
-    display: flex;
-    flex-direction: column;
-  }
-  
-  header .header__search-bar .nav p:hover a {
-    color: #feffde;
-  }
-  
-  header .header__search-bar .fas {
-    position: absolute;
-    top: 12px;
-    right: 10px;
-  }
-  
-  header .header__icon {
-    width: 25%;
-  }
-  
-  header .header__icon ul li {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-  }
-  
-  header .header__icon ul li h3 {
-    padding-top: 5px;
-  }
-  
-  header .header__icon ul {
-    display: flex;
-    justify-content: space-around;
-  }
-  
-  header .header__icon ul li .header__icon_circle {
-    width: 50px;
-    height: 50px;
-    background-color: #54b435;
-    border-radius: 50%;
-    position: relative;
-    cursor: pointer;
-  }
-  
-  header .header__icon ul li .shopping-bag,
-  header .header__icon ul li .noti  {
-    position: relative;
-  }
-  
-  header .header__icon ul li .shopping-bag::before,
-  header .header__icon ul li .noti::before {
-    position: absolute;
-    content: attr(current-count);
-    top: 0;
-    right: -5px;
-    width: 18px;
-    height: 18px;
-    background-color: #feffde;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-  }
-  
-  header .header__icon ul li .fas {
-    font-size: 20px;
-    position: absolute;
-    top: 13px;
-    left: 16px;
-  }
-  
-  header .header__icon ul li .header__icon_circle:hover {
-    background-color: #82cd47;
-  }
+ header #mobile {
+  display: none;
+}
+
+header {
+  background-color: #76a463;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  left: 0;
+  top: 0;
+  height: 100px;
+  z-index: 1;
+}
+
+.header__icon-mobile {
+  display: none;
+}
+
+header .nav p {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+header .header__logo img {
+  margin-top: 20px;
+  height: 100px;
+}
+
+header .header__search-bar {
+  width: 40%;
+  position: relative;
+}
+
+header .header__search-bar input {
+  border-radius: 10px;
+  height: 40px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+}
+
+header .header__search-bar .nav {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 20px;
+}
+
+header .header__search-bar .nav p:hover a {
+  color: #feffde;
+}
+
+header .header__search-bar .fas {
+  position: absolute;
+  top: 12px;
+  right: 10px;
+}
+
+header .header__icon {
+  width: 25%;
+}
+
+header .header__icon .close-sidebar {
+  display: none;
+}
+
+header .header__icon ul li {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+header .header__icon ul li h3 {
+  padding-top: 5px;
+}
+
+header .header__icon ul {
+  display: flex;
+  justify-content: space-around;
+}
+
+header .header__icon ul a {
+  width: 150px;
+}
+
+header .header__icon ul li .header__icon_circle {
+  width: 50px;
+  height: 50px;
+  background-color: #54b435;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+header .header__icon ul li .shopping-bag,
+header .header__icon ul li .noti {
+  position: relative;
+}
+
+header .header__icon ul li .shopping-bag::before,
+header .header__icon ul li .noti::before {
+  position: absolute;
+  content: attr(current-count);
+  top: 0;
+  right: -5px;
+  width: 18px;
+  height: 18px;
+  background-color: #feffde;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+header .header__icon ul li .fas {
+  font-size: 20px;
+  position: absolute;
+  top: 13px;
+  left: 16px;
+}
+
+header .header__icon ul li .header__icon_circle:hover {
+  background-color: #82cd47;
+}
   body{
     
     background-color: rgb(244,  244, 244);

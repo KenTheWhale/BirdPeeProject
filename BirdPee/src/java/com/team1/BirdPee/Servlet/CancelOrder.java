@@ -6,8 +6,10 @@
 package com.team1.BirdPee.Servlet;
 
 import com.team1.BirdPee.DAO.BirdPeeDAO;
+import com.team1.BirdPee.DTO.OrderDetails;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +36,10 @@ public class CancelOrder extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             int orderid = Integer.parseInt(request.getParameter("orderid"));
             String reason = request.getParameter("reason");
+            ArrayList<OrderDetails> listOD = BirdPeeDAO.ORDER_getOrderByID(orderid).getListOD();
+            for (OrderDetails orderDetails : listOD) {
+                BirdPeeDAO.PRODUCT_updateProductQuantityAfterCheckOut(-orderDetails.getQuantity(), orderDetails.getProductID());
+            }
             BirdPeeDAO.ORDER_changeStatus(orderid, 1);
             BirdPeeDAO.CANCELLATION_addCancelation(orderid, reason);
             response.sendRedirect("OrderDetail.jsp?id=" + orderid);

@@ -32,7 +32,7 @@ const data2 = {
   ],
   datasets: [
     {
-      label: "Status",
+      label: "Quantity",
       data: [
           OSBCdata_1.value,
           OSBCdata_2.value,

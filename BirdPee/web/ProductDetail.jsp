@@ -4,6 +4,7 @@
     Author     : Admin
 --%>
 
+<%@page import="com.team1.BirdPee.DTO.Item"%>
 <%@page import="com.team1.BirdPee.DAO.BirdPeeDAO"%>
 <%@page import="com.team1.BirdPee.DTO.Discount"%>
 <%@page import="com.team1.BirdPee.DTO.Customer"%>
@@ -32,9 +33,16 @@
     <body>
         <%
             Customer ac = (Customer) session.getAttribute("user");
-            Product product = BirdPeeDAO.PRODUCT_getProductByID((int) session.getAttribute("id"));
-            ArrayList<String> listI = BirdPeeDAO.PRODUCT_getImages(product.getId());
-            Shop shop = BirdPeeDAO.SHOP_getShopByProductID(product.getId());
+            if (session.getAttribute("id") == null) {
+                response.sendRedirect("Homepage.jsp");
+            } else {
+                Product product = BirdPeeDAO.PRODUCT_getProductByID((int) session.getAttribute("id"));
+                ArrayList<String> listI = BirdPeeDAO.PRODUCT_getImages(product.getId());
+                Shop shop = BirdPeeDAO.SHOP_getShopByProductID(product.getId());
+                ArrayList<String> listN = new ArrayList<>();
+                if (ac != null) {
+                    listN = BirdPeeDAO.ACCOUNT_getNotification(ac.getId());
+                }
         %>
         <header>
             <div class="header__logo">
@@ -71,7 +79,7 @@
                     </a>
                     <a href="<%= (ac == null) ? "Login.jsp" : "Notification.jsp"%>">
                         <li>
-                            <div class="header__icon_circle noti" current-count="0">
+                            <div class="header__icon_circle noti" current-count="<%= listN.size()%>">
                                 <i class="fas fa-solid fa-bell"></i>
                             </div>
                             <h4>Notification</h4>
@@ -107,7 +115,7 @@
                 </div>
                 <div class="detail-column">
                     <h5 style="font-size: 20px; color: grey"><%= shop.getName()%></h5>
-                    <h3 style="font-size: 24px"><%= product.getName() %></h3>
+                    <h3 style="font-size: 24px"><%= product.getName()%></h3>
                     <div class="feedback-place">
                         <ul>
                             <li>
@@ -118,20 +126,58 @@
                                     ></i>
                             </li>
                             <li><u><%= BirdPeeDAO.SHOP_countFeedbackPerProduct(product.getId())%></u> Feedback</li>
-                            <li><u><%= product.getQuantity()%></u> available</li>
+                            <li><u id="maxqty"><%= product.getQuantity()%></u> available</li>
                             <li><u><%= product.getSoldQuantity()%></u> Has Been Sold</li>
                         </ul>
+                        <%
+                            if (ac != null) {
+                        %>
                         <div class="report">
-                            <p><a href="#">Report Product</a></p>
+                            <p id="report-button">Report Product</p>
                         </div>
+                        <%
+                            }
+                        %>
                     </div>
                     <form action="BirdPee" method="post">
+                        <%
+                            Item it = new Item();
+                            if (ac != null) {
+                                ArrayList<Item> listItem = BirdPeeDAO.CART_getAllItemInCart(ac.getId());
+                                for (Item item : listItem) {
+                                    if (item.getProductID() == product.getId()) {
+                                        it = item;
+                                        break;
+                                    }
+                                }
+                            }
+                        %>
                         <h2 style="font-size: 40px; color: green; margin: 20px 0"><%= String.format("%,.0f", BirdPeeDAO.PRODUCT_getProductDiscountOrNotByID(product.getId()))%> VND</h2>
-                        <input type="number" value="1" name="quantity" min="1" max="<%= product.getQuantity()%>" />
+                        <input type="number" id="quantity"  value="1" name="quantity" min="1" oninput="updateInput()" />
+                        <input type="hidden" id="cartquantity"  value="<%= it.getQuantity()%>" name="cartquantity" oninput="updateInput()" />
                         <button id="addToCart" name="action" value="AddToCart">Add To Cart</button>
                         <button name="action" value="AddToCartC">Buy Now</button>
                     </form>
+                    <div class="shadow"></div>
 
+                    <div id="popup-report">
+                        <div class="title"><h2>Explain your reason</h2></div>
+                        <div id="close">&times;</div>
+                        <form action="BirdPee" method="post">
+                            <div class="content">
+                                <textarea
+                                    required
+                                    name="report"
+                                    id=""
+                                    cols="30"
+                                    rows="10"
+                                    placeholder="Your Report Description"
+                                    ></textarea>
+                            </div>
+                            <input type="hidden" name="pid" value="<%= product.getId()%>"/>
+                            <button name="action" value="SendReport">Send Report</button>
+                        </form>
+                    </div>
                     <div class="short-des">
                         <h2>Short Desciption:</h2>
                         <span>
@@ -163,6 +209,12 @@
                 </div>
                 <p>ADD TO CART SUCCESSFULLY</p>
             </div>
+            <div class="popup-fail">
+                <div class="popup-icon">
+                    <i class="fa-solid fa-x"></i>
+                </div>
+                <p>CART EXCEEDS MAXIMUM QUANTITY</p>
+            </div>
 
             <div class="shadow"></div>
 
@@ -190,8 +242,7 @@
                             <p>Rating</p>
                         </div>
                         <div class="button-place">
-                            <a href="#"><button>View Shop</button></a>
-                            <a href="#"><button>Chat With Shop</button></a>
+                            <a href="BirdPee?action=ViewShop&id=<%=shop.getId()%>"><button>View Shop</button></a>
                         </div>
                     </div>
                 </div>
@@ -214,116 +265,73 @@
                         <p style="font-size: 32px; color: green">
                             <span style="font-size: 36px"><%= BirdPeeDAO.PRODUCT_getRatingByID(product.getId())%></span> on 5
                         </p>
-                        <i class="fas fa-solid fa-star" style="color: green"></i
-                        ><i class="fas fa-solid fa-star" style="color: green"></i
-                        ><i class="fas fa-solid fa-star" style="color: green"></i
-                        ><i class="fas fa-solid fa-star" style="color: green"></i
-                        ><i class="fas fa-solid fa-star" style="color: green"></i>
+                        <%
+                            for (int i = 0; i < BirdPeeDAO.PRODUCT_getRatingByID(product.getId()); i++) {
+                        %>
+                        <i class="fas fa-solid fa-star" style="color: green"></i>
+                        <%
+                            }
+                            for (int i = 0; i < (5 - BirdPeeDAO.PRODUCT_getRatingByID(product.getId())); i++) {
+                        %>
+                        <i class="fas fa-solid fa-star" style="color: gray"></i>
+                        <%
+                            }
+                        %>
                     </div>
 
                     <div class="sort-column">
-                        <button class="active">All</button>
-                        <button>5 stars</button>
-                        <button>4 stars</button>
-                        <button>3 stars</button>
-                        <button>2 stars</button>
-                        <button>1 stars</button>
+                        <a href="ProductDetail.jsp"><button class="<%= request.getParameter("star") == null ? "active" : ""%>">All</button></a>
+                        <a href="ProductDetail.jsp?star=5"><button class="<%= request.getParameter("star") != null && request.getParameter("star").equalsIgnoreCase("5") ? "active" : ""%>">5 stars</button></a>
+                        <a href="ProductDetail.jsp?star=4"><button class="<%= request.getParameter("star") != null && request.getParameter("star").equalsIgnoreCase("4") ? "active" : ""%>">4 stars</button></a>
+                        <a href="ProductDetail.jsp?star=3"><button class="<%= request.getParameter("star") != null && request.getParameter("star").equalsIgnoreCase("3") ? "active" : ""%>">3 stars</button></a>
+                        <a href="ProductDetail.jsp?star=2"><button class="<%= request.getParameter("star") != null && request.getParameter("star").equalsIgnoreCase("2") ? "active" : ""%>">2 stars</button></a>
+                        <a href="ProductDetail.jsp?star=1"><button class="<%= request.getParameter("star") != null && request.getParameter("star").equalsIgnoreCase("1") ? "active" : ""%>">1 stars</button></a>
                     </div>
                 </div>
 
                 <div class="comment-section">
+                    <%
+                        ArrayList<String> listF = BirdPeeDAO.PRODUCT_getProductFeedback(product.getId(), request.getParameter("star"));
+                        for (String item : listF) {
+                            String img = item.split("@")[0].trim();
+                            String username = item.split("@")[1].trim();
+                            String createDate = item.split("@")[2].trim();
+                            int rating = Integer.parseInt(item.split("@")[3].trim());
+                            String comment = item.split("@")[4].trim();
+                    %>
                     <div class="row">
                         <div class="user-info-column">
-                            <img src="images/use.png" alt="" />
-                            <h3>Username</h3>
+                            <img src="<%= img%>" alt="" />
+                            <h3><%= username%></h3>
                         </div>
                         <div class="feedback-column">
                             <ul>
-                                <li style="font-weight: bold; color: green">27-5-2023</li>
+                                <li style="font-weight: bold; color: green"><%= createDate%></li>
                                 <li style="padding: 8px 0">
-                                    <i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i>
+                                    <%
+                                        for (int i = 0; i < rating; i++) {
+                                    %>
+                                    <i class="fas fa-solid fa-star" style="color: green"></i>
+                                    <%
+                                        }
+                                        for (int i = 0; i < (5 - rating); i++) {
+                                    %>
+                                    <i class="fas fa-solid fa-star" style="color: gray"></i>
+                                    <%
+                                        }
+                                    %>
                                 </li>
                                 <li>
                                     <p>
-                                        Nice bird, very lively bird but it only lived for 2 years
+                                        <%= comment%>
                                     </p>
                                 </li>
                             </ul>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="user-info-column">
-                            <img src="images/use.png" alt="" />
-                            <h3>Username</h3>
-                        </div>
-                        <div class="feedback-column">
-                            <ul>
-                                <li style="font-weight: bold; color: green">27-5-2023</li>
-                                <li style="padding: 8px 0">
-                                    <i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i>
-                                </li>
-                                <li>
-                                    <p>
-                                        Nice bird, very lively bird but it only lived for 2 years
-                                    </p>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="user-info-column">
-                            <img src="images/use.png" alt="" />
-                            <h3>Username</h3>
-                        </div>
-                        <div class="feedback-column">
-                            <ul>
-                                <li style="font-weight: bold; color: green">27-5-2023</li>
-                                <li style="padding: 8px 0">
-                                    <i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i>
-                                </li>
-                                <li>
-                                    <p>
-                                        Nice bird, very lively bird but it only lived for 2 years
-                                    </p>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="user-info-column">
-                            <img src="images/use.png" alt="" />
-                            <h3>Username</h3>
-                        </div>
-                        <div class="feedback-column">
-                            <ul>
-                                <li style="font-weight: bold; color: green">27-5-2023</li>
-                                <li style="padding: 8px 0">
-                                    <i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i
-                                    ><i class="fas fa-solid fa-star" style="color: green"></i>
-                                </li>
-                                <li>
-                                    <p>
-                                        Nice bird, very lively bird but it only lived for 2 years
-                                    </p>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+                    <%
+                        }
+                    %>
                     <ul class="listPage"></ul>
                 </div>
             </div>
@@ -347,7 +355,7 @@
                                 <img src="<%= listImg.get(0)%>" alt="" /><!--product img -->
                                 <h5><%= related_shop.getName()%></h5>
                                 <div class="name-text">
-                                    <p><%= related_product.getName() %></p>
+                                    <p><%= related_product.getName()%></p>
                                 </div>
                                 <div class="sold">
                                     <p style="margin-bottom: 5px"><%= related_product.getSoldQuantity()%> Has Been Sold</p>
@@ -378,7 +386,7 @@
                                 <div class="price">
                                     <span class="old-price" style="text-decoration: line-through; color: gray; font-size: 70%"><%= String.format("%,.0f", related_product.getPrice())%> VND</span>
 
-                                    <span class="new-price" style="color: green"><%= String.format("%,.0f", BirdPeeDAO.PRODUCT_getProductDiscountOrNotByID(related_product.getId())) %> VND</span>
+                                    <span class="new-price" style="color: green"><%= String.format("%,.0f", BirdPeeDAO.PRODUCT_getProductDiscountOrNotByID(related_product.getId()))%> VND</span>
                                 </div>
                                 <%
                                 } else {
@@ -443,6 +451,9 @@
                 </div>
             </div>
         </footer>
+        <%
+            }
+        %>
 
         <script src="js/ProductDetail.js"></script>
     </body>

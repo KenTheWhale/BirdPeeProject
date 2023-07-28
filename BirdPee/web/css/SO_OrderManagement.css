@@ -161,15 +161,14 @@ main {
 
 main .main-container {
     width: 90%;
-    background-color: white;
     margin: 30px auto;
-    box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.5);
+    background-color: white;
 }
 
 main .main-container .sort {
     display: flex;
     justify-content: space-between;
-    width: 50%;
+    width: 70%;
 }
 
 main .main-container .sort div {
@@ -223,24 +222,28 @@ main .main-container .search button:hover {
     background-color: #82cd47;
 }
 
+
+main table tbody tr {
+    height: 80px;
+}
+
+
 main .order-status,
-main .feedback-place {
+main .send-mail {
     width: 100%;
     margin: 50px auto;
     background-color: white;
     border-top: 1px solid rgba(128, 128, 128, 0.416);
 }
 
-main .order-status h1 {
+main .order-status h1,
+main .send-mail h1 {
     margin: 20px 10px;
     color: black;
 }
 
-main .feedback-place {
-    margin-top: 0px;
-}
-
-main .main-container .order-status table {
+main .main-container .order-status table,
+main .main-container .send-mail table {
     width: 95%;
     border-collapse: collapse;
     table-layout: fixed;
@@ -248,11 +251,9 @@ main .main-container .order-status table {
     margin: 0 auto;
 }
 
-
-main .main-container .order-status table tr td {
+main .main-container .order-status table tr td,
+main .main-container .send-mail table tr td {
     text-align: left;
-    padding-left: 10px;
-    padding-right: 10px;
 }
 
 main .main-container .order-status table tr td:first-child {
@@ -277,6 +278,22 @@ main .main-container .order-status table tr td:nth-child(7) {
     width: 200px;
 }
 
+main .main-container .send-mail table tr td:first-child {
+    width: 250px;
+}
+
+main .main-container .send-mail table tr td:nth-child(2) {
+    width: 250px;
+}
+
+main .main-container .send-mail table tr td:nth-child(3){
+    width: 250px;
+}
+
+main .main-container .send-mail table tr td:nth-child(4) {
+    width: 150px;
+}
+
 /* 
 main .main-container .order-status table tr td:nth-child(3) {
   width: 15%;
@@ -284,6 +301,10 @@ main .main-container .order-status table tr td:nth-child(3) {
 
 main .main-container .order-status table tr td:last-child {
     text-align: center;
+}
+
+main .main-container .send-mail {
+    margin-top: 30px;
 }
 
 main .main-container .order-status .table-section {
@@ -311,10 +332,6 @@ main table thead tr td {
 main table img {
     width: 100px;
     height: 100px;
-}
-
-main table tbody tr {
-    height: 80px;
 }
 
 main table tbody tr td {
@@ -397,7 +414,7 @@ main #popup {
     width: 60%;
     background-color: white;
     margin: 0 auto;
-    height: 60vh;
+    height: 90vh;
     color: black;
     position: fixed;
     top: 50%;
@@ -407,12 +424,22 @@ main #popup {
     border: 1px solid silver;
     display: none;
     padding: 20px 30px;
-    padding-top: 60px;
 }
 
 main #popup.show {
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow-y: scroll;
+    gap: 20px;
+}
+
+main #popup .popup-container {
+    display: flex;
+    width: 100%;
+    height: 55%;
+    border-bottom: 1px solid black;
+    padding: 20px 0;
 }
 
 main #popup #close {
@@ -428,6 +455,11 @@ main #popup #close:hover {
     color: silver;
 }
 
+
+main #popup .image-place {
+    width: 40%;
+}
+
 main #popup .content::-webkit-scrollbar {
     width: 5px;
     background-color: white;
@@ -439,27 +471,29 @@ main #popup .content::-webkit-scrollbar-thumb {
 
 main #popup img {
     width: 100%;
-    max-height: 80%;
+    height: 100%;
 }
+
+
 
 main #popup .content {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    width: 50%;
     margin: 0 auto;
-    padding-right: 50px;
     overflow-y: scroll;
-    height: 80%;
-}
-
-main #popup .content div span {
-    font-weight: normal
+    height: 100%;
 }
 
 main #popup .content div {
-    width: 100%;
+    margin: 20px 0;
+    width: 90%;
+    display: flex;
     font-weight: bold;
 }
+main #popup .content div span {
+    font-weight: normal;
+    margin-left: 5px;
+}
+
 
 main #popup .content input {
     width: 100%;

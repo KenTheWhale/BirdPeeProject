@@ -4,6 +4,7 @@
     Author     : Admin
 --%>
 
+<%@page import="java.util.ArrayList"%>
 <%@page import="com.team1.BirdPee.DTO.OrderDetails"%>
 <%@page import="com.team1.BirdPee.DTO.Product"%>
 <%@page import="com.team1.BirdPee.DAO.BirdPeeDAO"%>
@@ -32,6 +33,7 @@
                 int orderID = Integer.parseInt(request.getParameter("id"));
                 Order o = BirdPeeDAO.ORDER_getOrderByID(orderID);
                 Shop s = BirdPeeDAO.SHOP_getShopByProductID(o.getListOD().get(0).getProductID());
+                ArrayList<String> listN = BirdPeeDAO.ACCOUNT_getNotification(ac.getId());
         %>
         <header>
             <div class="header__logo">
@@ -63,7 +65,7 @@
                     </a>
                     <a href="Notification.jsp">
                         <li>
-                            <div class="header__icon_circle noti" current-count="0">
+                            <div class="header__icon_circle noti" current-count="<%= listN.size() %>">
                                 <i class="fas fa-solid fa-bell"></i>
                             </div>
                             <h4>Notification</h4>

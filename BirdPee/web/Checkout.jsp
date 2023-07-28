@@ -32,6 +32,7 @@
             } else {
                 ArrayList<Item> listI = BirdPeeDAO.CART_getAllItemInCart(ac.getId());
                 String address = BirdPeeDAO.ACCOUNT_getChosenAddress(ac.getId());
+                ArrayList<String> listN = BirdPeeDAO.ACCOUNT_getNotification(ac.getId());
                 if (address.isEmpty()) {
                     response.sendRedirect("Address.jsp");
                 } else {
@@ -66,7 +67,7 @@
                     </a>
                     <a href="Notification.jsp">
                         <li>
-                            <div class="header__icon_circle noti" current-count="0">
+                            <div class="header__icon_circle noti" current-count="<%= listN.size() %>">
                                 <i class="fas fa-solid fa-bell"></i>
                             </div>
                             <h4>Notification</h4>
@@ -249,9 +250,6 @@
                                         <div class="info">
                                             <p style="font-weight: bold; text-align: left;">
                                                 <%= name%>
-                                            </p>
-                                            <p style="text-align: left;">
-                                                <%= BirdPeeDAO.PRODUCT_getDescription("short", BirdPeeDAO.PRODUCT_getProductByID(i.getProductID()).getDescription())%>
                                             </p>
                                         </div>
                                     </div>

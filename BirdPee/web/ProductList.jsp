@@ -40,6 +40,16 @@
             if (session.getAttribute("total") != null) {// from Success,jsp
                 session.removeAttribute("total");
             }
+            if (session.getAttribute("productShopSubSort") != null) {// from ShopProfile.jsp
+                session.removeAttribute("productShopSubSort");
+            }
+            if (session.getAttribute("productShopSort") != null) {// from ShopProfile.jsp
+                session.removeAttribute("productShopSort");
+            }
+            ArrayList<String> listN = new ArrayList<>();
+            if (ac != null) {
+                listN = BirdPeeDAO.ACCOUNT_getNotification(ac.getId());
+            }
         %>
         <header>
             <div class="header__logo">
@@ -69,7 +79,7 @@
                 </form>
                 <div class="nav">
                     <p><a href="Homepage.jsp">Home Page</a></p>
-                    <p><a href="ProductList.jsp">Bird's product</a></p>
+                    <p><a href="ProductList.jsp">Bird's products</a></p>
                     <p><a href="ShopList.jsp">Shop List</a></p>
                 </div>
             </div>
@@ -86,7 +96,7 @@
                     </a>
                     <a href="<%= (ac == null) ? "Login.jsp" : "Notification.jsp"%>">
                         <li>
-                            <div class="header__icon_circle noti" current-count="0">
+                            <div class="header__icon_circle noti" current-count="<%= listN.size()%>">
                                 <i class="fas fa-solid fa-bell"></i>
                             </div>
                             <h4>Notification</h4>
@@ -139,20 +149,6 @@
                             }
                         %>
                 </div>
-
-                <div class="main__filter_price">
-                    <h3>Price Range</h3>
-                    <div class="price-input">
-                        <input type="text" placeholder="$ From" />
-                        <span style="color: grey">-</span>
-                        <input type="text" placeholder="$ To" />
-                        <button>
-                            <span style="font-weight: bold; font-size: 16px; color: black"
-                                  >Apply</span
-                            >
-                        </button>
-                    </div>
-                </div>
             </nav>
             <div class="main__container">
                 <div class="main__container_sort">
@@ -170,7 +166,7 @@
 
                             <%
                                 String sort = (String) session.getAttribute("productSort");
-                                if(request.getParameter("sort") != null){
+                                if (request.getParameter("sort") != null) {
                                     sort = request.getParameter("sort");
                                     subSort = "none";
                                 }
@@ -218,7 +214,7 @@
                                         }
                                         for (int i = 0; i < (5 - rating); i++) {
                                     %>
-                                    <i class="fa-solid fa-star" style="color: whitesmoke"></i>
+                                    <i class="fa-solid fa-star" style="color: gray"></i>
                                     <%
                                         }
                                     %>

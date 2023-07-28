@@ -6,8 +6,10 @@
 package com.team1.BirdPee.Servlet;
 
 import com.team1.BirdPee.DAO.BirdPeeDAO;
+import com.team1.BirdPee.DTO.OrderDetails;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -35,12 +37,17 @@ public class SOOrderProgress extends HttpServlet {
             String ac = (String) request.getAttribute("ac");
             int orderID = Integer.parseInt(request.getParameter("id"));
             int recentStatus = Integer.parseInt(request.getParameter("status"));
+            ArrayList<OrderDetails> listOD = BirdPeeDAO.ORDER_getOrderByID(orderID).getListOD();
+
             switch (ac) {
                 case "approve":
                     BirdPeeDAO.ORDER_changeStatus(orderID, recentStatus + 1);
                     break;
                 case "cancel":
                     BirdPeeDAO.ORDER_changeStatus(orderID, 1);
+                    for (OrderDetails orderDetails : listOD) {
+                        BirdPeeDAO.PRODUCT_updateProductQuantityAfterCheckOut(-orderDetails.getQuantity(), orderDetails.getProductID());
+                    }
                     break;
             }
             response.sendRedirect("SO_OrderManagement.jsp");

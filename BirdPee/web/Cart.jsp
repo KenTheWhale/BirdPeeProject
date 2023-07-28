@@ -43,12 +43,19 @@
                 if (session.getAttribute("productSort") != null) {
                     session.removeAttribute("productSort");
                 }
+                if (session.getAttribute("productShopSubSort") != null) {// from ShopProfile.jsp
+                    session.removeAttribute("productShopSubSort");
+                }
+                if (session.getAttribute("productShopSort") != null) {// from ShopProfile.jsp
+                    session.removeAttribute("productShopSort");
+                }
                 if (session.getAttribute("shipchoice") != null) {// from Success,jsp
                     session.removeAttribute("shipchoice");
                 }
                 if (session.getAttribute("total") != null) {// from Success,jsp
                     session.removeAttribute("total");
                 }
+                ArrayList<String> listN = BirdPeeDAO.ACCOUNT_getNotification(ac.getId());
         %>
         <header>
             <div class="header__logo">
@@ -80,7 +87,7 @@
                     </a>
                     <a href="Notification.jsp">
                         <li>
-                            <div class="header__icon_circle noti" current-count="0">
+                            <div class="header__icon_circle noti" current-count="<%= listN.size()%>">
                                 <i class="fas fa-solid fa-bell"></i>
                             </div>
                             <h4>Notification</h4>
@@ -128,7 +135,6 @@
                                         <td><img src="<%= listImg.get(0)%>" alt="" /></td>
                                         <td> <div>
                                                 <p>   <%= name%></p>
-                                                <p><%= BirdPeeDAO.PRODUCT_getDescription("short", BirdPeeDAO.PRODUCT_getProductByID(i.getProductID()).getDescription())%></p>
                                             </div>
                                         </td>
 
@@ -177,16 +183,6 @@
                                     <h2>Items: <%= BirdPeeDAO.CART_countNumberOfItemInCart(ac.getId())%></h2>
                                 </div>
 
-                                <div class="give-code">
-                                    <div class="column-title">
-                                        <p style="font-size: 24px; margin-bottom: 10px">VOUCHER CODE</p>
-                                    </div>
-                                    <div class="input-data">
-                                        <input class="text-input" type="text" name="code" />
-                                        <div class="underline"></div>
-                                        <label>Enter Your Code</label>
-                                    </div>
-                                </div>
                                 <div class="total">
                                     <div class="column-title">
                                         <p style="font-size: 24px; margin-bottom: 10px">

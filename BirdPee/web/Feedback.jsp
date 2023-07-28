@@ -4,6 +4,7 @@
     Author     : Admin
 --%>
 
+<%@page import="java.util.ArrayList"%>
 <%@page import="com.team1.BirdPee.DTO.Product"%>
 <%@page import="com.team1.BirdPee.DTO.Shop"%>
 <%@page import="com.team1.BirdPee.DTO.Order"%>
@@ -32,6 +33,7 @@
                 Order o = BirdPeeDAO.ORDER_getOrderByID(orderID);
                 Product p = BirdPeeDAO.PRODUCT_getProductByID(Integer.parseInt(request.getParameter("id")));
                 Shop s = BirdPeeDAO.SHOP_getShopByProductID(p.getId());
+                ArrayList<String> listN = BirdPeeDAO.ACCOUNT_getNotification(ac.getId());
         %>
         <header>
             <div class="header__logo">
@@ -63,7 +65,7 @@
                     </a>
                     <a href="Notification.jsp">
                         <li>
-                            <div class="header__icon_circle noti" current-count="0">
+                            <div class="header__icon_circle noti" current-count="<%= listN.size()%>">
                                 <i class="fas fa-solid fa-bell"></i>
                             </div>
                             <h4>Notification</h4>
@@ -142,37 +144,40 @@
                 <div class="main-right-container">
                     <form action="BirdPee" method="post">
                         <div class="product-review">
-                            <div class="delivered-date">
-                                Delivered on : <%= BirdPeeDAO.DATESTRINGCONVERTER_convertUtilDateToStringInCheckOut(o.getShipDate(), 0)%>
-                            </div>
-                            <div class="shop-review-title">
-                                Sold By 
-                                <span><a href="#" style="color: #195fd7;"><%= s.getName()%></a></span>
-                            </div>
-                            <div class="instruction">
-                                Rate and review purchased product
-                            </div>
                             <div class="product-row">
-                                <div class="product-img-wrapper">
-                                    <img src="<%= BirdPeeDAO.PRODUCT_getImages(p.getId()).get(0)%>" alt="">
-                                </div>
-                                <div class="product-rating">
+                                <div class="product-detail">
+                                    <div class="product-img-wrapper">
+                                        <img src="<%= BirdPeeDAO.PRODUCT_getImages(p.getId()).get(0)%>" alt="">
+                                    </div>
                                     <div class="product-name">
                                         <%= p.getName()%>
                                     </div>
+                                </div>
+                                <div class="product-bot">
+                                    <div class="delivered-date">
+                                        Delivered on : <%= BirdPeeDAO.DATESTRINGCONVERTER_convertUtilDateToStringInCheckOut(o.getShipDate(), 0)%>
+                                    </div>
+                                    <div class="shop-sold">
+                                        Sold by : <%= s.getName()%>
+                                    </div>
+                                </div>
+                                <div class="product-rating">
                                     <div class="rating">
+                                        <div class="instruction">
+                                            Rate and review purchased product
+                                        </div>
                                         <div class="star-widget">
-                                            <input type="radio" name="rate" value="5" id="rate-5">
+                                            <input required type="radio" name="rate" value="5" id="rate-5">
                                             <label for="rate-5"><i class="fa-solid fa-star"></i></label>
-                                            <input type="radio" name="rate" value="4" id="rate-4">
+                                            <input required type="radio" name="rate" value="4" id="rate-4">
                                             <label for="rate-4"><i class="fa-solid fa-star"></i></label>
-                                            <input type="radio" name="rate" value="3" id="rate-3">
+                                            <input required type="radio" name="rate" value="3" id="rate-3">
                                             <label for="rate-3"><i class="fa-solid fa-star"></i></label>
-                                            <input type="radio" name="rate" value="2" id="rate-2">
+                                            <input required type="radio" name="rate" value="2" id="rate-2">
                                             <label for="rate-2"><i class="fa-solid fa-star"></i></label>
-                                            <input type="radio" name="rate" value="1" id="rate-1">
+                                            <input required type="radio" name="rate" value="1" id="rate-1">
                                             <label for="rate-1"><i class="fa-solid fa-star"></i></label>
-                                            <div class="abc" style="order: -1; width: 150px;  ">
+                                            <div class="abc" style="order: -1; width: 150px; ">
                                             </div>
                                         </div>
                                     </div>
@@ -181,13 +186,12 @@
                                             Feedback Detail
                                         </div>
                                         <div class="feedback-form-input">
-                                            <textarea placeholder="What do you think of this product?" name="comment" id="" cols="60" rows="5"></textarea>
+                                            <textarea placeholder="What do you think of this product?" name="comment" id="" cols="120" rows="5"></textarea>
                                         </div>
-                                    </div>
-                                    <div class="submit">
                                         <input type="hidden" name="pid" value="<%= request.getParameter("id")%>"/>
                                         <input type="hidden" name="oid" value="<%= request.getParameter("oid")%>"/>
-                                        <button type="submit" name="action" value="SendFeedback">Submit</button>
+                                        <button type="submit" name="action" value="SendFeedback"
+                                            style="float: right; margin-right: 3%; width: 75px; background-color: #57d15f; margin-top: 1%; height: 30px; border-radius: 5px; cursor: pointer;">Submit</button>
                                     </div>
                                 </div>
                             </div>

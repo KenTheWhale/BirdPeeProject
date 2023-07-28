@@ -40,12 +40,12 @@ public class AddToCart extends HttpServlet {
             if (session.getAttribute("user") == null) {
                 response.sendRedirect("Login.jsp");
             } else {
-                if (session.getAttribute("id") != null && request.getParameter("quantity") != null) {
+                if (session.getAttribute("id") != null) {
                     int id = (int) session.getAttribute("id");
                     int quantity = Integer.parseInt(request.getParameter("quantity"));
+                    int cartQuantity = Integer.parseInt(request.getParameter("cartquantity"));
                     Customer ac = (Customer) session.getAttribute("user");
-
-                    if (BirdPeeDAO.CART_updateCart(id, ac.getId(), quantity)) {
+                    if ((BirdPeeDAO.PRODUCT_getProductByID(id).getQuantity() >= quantity + cartQuantity) && BirdPeeDAO.CART_updateCart(id, ac.getId(), quantity)) {
                         switch(action){
                             case "AddToCart":
                                 request.getRequestDispatcher("ProductDetail.jsp").forward(request, response);

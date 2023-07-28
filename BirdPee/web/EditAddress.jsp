@@ -27,6 +27,7 @@
                 response.sendRedirect("Login.jsp");
             } else {
                 String editedAddress = "";
+                ArrayList<String> listN = BirdPeeDAO.ACCOUNT_getNotification(ac.getId());
                 if(request.getParameter("id") != null){
                     editedAddress = BirdPeeDAO.ACCOUNT_getAddressByIDReturnDisProName(Integer.parseInt(request.getParameter("id")));
                     session.setAttribute("addressid", Integer.parseInt(request.getParameter("id")));
@@ -64,7 +65,7 @@
                     </a>
                     <a href="Notification.jsp">
                         <li>
-                            <div class="header__icon_circle noti" current-count="0">
+                            <div class="header__icon_circle noti" current-count="<%= listN.size() %>">
                                 <i class="fas fa-solid fa-bell"></i>
                             </div>
                             <h4>Notification</h4>

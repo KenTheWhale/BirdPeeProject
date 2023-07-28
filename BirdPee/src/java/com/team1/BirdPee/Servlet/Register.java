@@ -45,11 +45,9 @@ public class Register extends HttpServlet {
            
            if(pass.equals(cpass)){
                Account ac = BirdPeeDAO.ACCOUNT_checkExistedCustomerByEmail(mail);
-               if(ac.getUsername() == null && BirdPeeDAO.ACCOUNT_createCustomerAccountByEmail(name, pass, ac.getRole(), 1, "Not set", mail, address, phone) != null){
-                   session.setAttribute("user", BirdPeeDAO.ACCOUNT_checkExistedCustomerByEmail(mail));
-                   destination = "Login.jsp";
-               } else{
-                   request.setAttribute("errorMsg", "This email has been registed");
+               if(ac.getUsername() == null && BirdPeeDAO.ACCOUNT_createCustomerAccountByEmail(name, pass, "CS", 1, "images/noimg.jpg", mail, address, phone) != null){
+                   request.setAttribute("mail", mail);
+                   destination = "SendOTPRegister";
                }
            } else{
                request.setAttribute("errorMsg", "Password doesn't match");

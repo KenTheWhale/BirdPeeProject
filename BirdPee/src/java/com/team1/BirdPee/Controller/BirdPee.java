@@ -50,6 +50,9 @@ public class BirdPee extends HttpServlet {
                     case "CheckOTP":
                         destination = "CheckOTP";
                         break;
+                    case "CheckOTPRegister":
+                        destination = "CheckOTPRegister";
+                        break;
                     case "ResetPass":
                         destination = "ResetPass";
                         break;
@@ -68,11 +71,17 @@ public class BirdPee extends HttpServlet {
                     case "PSort":
                         destination = "ProductSort";
                         break;
+                    case "PSSort":
+                        destination = "ProductShopSort";
+                        break;
                     case "OSort":
                         destination = "OrderSort";
                         break;
                     case "ViewProduct":
                         destination = "SendIDToProductDetail";
+                        break;
+                    case "ViewShop":
+                        destination = "SendIDToShopProfile";
                         break;
                     case "AddToCart":
                         request.setAttribute("ac", "AddToCart");
@@ -144,6 +153,15 @@ public class BirdPee extends HttpServlet {
                     case "SendFeedback":
                         destination = "SendFeedback";
                         break;
+                    case "SendReport":
+                        destination = "SendReport";
+                        break;
+                    case "FollowShop":
+                        destination = "FollowShop";
+                        break;
+                    case "UnfollowShop":
+                        destination = "UnfollowShop";
+                        break;
                         
                     //Shop owner
                     case "SOOderSearch":
@@ -171,6 +189,32 @@ public class BirdPee extends HttpServlet {
                         break;
                     case "SOReplyFeedback":
                         destination = "SOReplyFeedback";
+                        break;
+                    case "SOFirstCreate":
+                        destination = "SOFirstCreate";
+                        break;
+                    case "SOMailSend":
+                        destination = "SOMailSend";
+                        break;
+                        
+                    //Admin
+                    case "ADBanShop":
+                        destination = "ADBanShop";
+                        break;
+                    case "ADBanCus":
+                        destination = "ADBanCus";
+                        break;
+                    case "ADSearch":
+                        destination = "ADSearch";
+                        break;
+                    case "ADSearchCS":
+                        destination = "ADSearchCS";
+                        break;
+                    case "ADSearchShop":
+                        destination = "ADSearchShop";
+                        break;
+                    case "ADCreateSOAccount":
+                        destination = "ADCreateSOAccount";
                         break;
                     default:
                         break;

@@ -4,6 +4,9 @@
     Author     : Admin
 --%>
 
+<%@page import="com.team1.BirdPee.DTO.Product"%>
+<%@page import="com.team1.BirdPee.DTO.Shop"%>
+<%@page import="java.util.ArrayList"%>
 <%@page import="com.team1.BirdPee.DAO.BirdPeeDAO"%>
 <%@page import="com.team1.BirdPee.DTO.Customer"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -26,6 +29,19 @@
             if (session.getAttribute("user") == null) {
                 response.sendRedirect("Login.jsp");
             } else {
+                ArrayList<String> listN = BirdPeeDAO.ACCOUNT_getNotification(ac.getId());
+                if (session.getAttribute("productShopSubSort") != null) {// from ShopProfile.jsp
+                    session.removeAttribute("productShopSubSort");
+                }
+                if (session.getAttribute("productShopSort") != null) {// from ShopProfile.jsp
+                    session.removeAttribute("productShopSort");
+                }
+                if (session.getAttribute("productSubSort") != null) {
+                    session.removeAttribute("productSubSort");
+                }
+                if (session.getAttribute("productSort") != null) {
+                    session.removeAttribute("productSort");
+                }
         %>
         <header>
             <div class="header__logo">
@@ -57,7 +73,7 @@
                     </a>
                     <a href="Notification.jsp">
                         <li>
-                            <div class="header__icon_circle noti" current-count="0">
+                            <div class="header__icon_circle noti" current-count="<%= listN.size()%>">
                                 <i class="fas fa-solid fa-bell"></i>
                             </div>
                             <h4>Notification</h4>
@@ -137,15 +153,48 @@
                         <h1>Notification</h1>
                     </div>
                     <div class="main-right-content">
+                        <%
+                            if (listN.size() > 0) {
+                                for (String item : listN) {
+                                    int productID = Integer.parseInt(item.split("@")[0].trim());
+                                    Product p = BirdPeeDAO.PRODUCT_getProductByID(productID);
+                                    String productImg = BirdPeeDAO.PRODUCT_getImages(productID).get(0);
+                                    Shop s = BirdPeeDAO.SHOP_getShopByProductID(productID);
+                                    String reply = item.split("@")[1].trim();
+                                    int orderID = Integer.parseInt(item.split("@")[2].trim());
+                                    String createDate = item.split("@")[3].trim();
+                        %>
                         <div class="noti">
                             <div class="noti-logo">
-                                <img src="../images/img-01.png" alt="">
+                                <img src="<%= productImg%>" alt="">
                             </div>
                             <div class="noti-desc">
-                                <h3>This is A NOTI</h3>
-                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia officia perferendis recusandae magni commodi voluptate corporis alias. Cum aut sed enim labore, natus, expedita veritatis sequi rerum quae pariatur modi?</p>
+                                <h3 style="<%= BirdPeeDAO.ACCOUNT_checkIfFeedback(reply) ? "" : "color: green"%>">
+                                    <%= BirdPeeDAO.ACCOUNT_checkIfFeedback(reply)
+                                            ? "SHOP'S REPLY"
+                                            : "Product order successfully"%>
+                                </h3>
+                                <p style="color: gray; font-size: 12px">
+                                    Product: <a href="#" style="color: gray; font-weight: bold; font-size: 12px"><%= p.getName()%></a>
+                                </p>
+                                <p style="color: gray; font-size: 12px">
+                                    OrderID: <a href="#" style="color: gray; font-weight: bold; font-size: 12px"><%= orderID%></a>
+                                </p>
+                                <p style="color: gray; font-size: 12px">
+                                    Create date: <span style="color: gray; font-weight: bold; font-size: 12px"><%= createDate%></span>
+                                </p>
+                                <p>
+                                    <%= BirdPeeDAO.ACCOUNT_checkIfFeedback(reply)
+                                            ? s.getName() + ": " + reply
+                                            : ""%>
+                                </p>
                             </div>
                         </div>
+                        <%
+                                }
+                            }
+                        %>
+
                     </div>
                 </div>
             </div>

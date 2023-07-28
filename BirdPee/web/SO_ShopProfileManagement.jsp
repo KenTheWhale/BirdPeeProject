@@ -49,7 +49,7 @@
 
             <div class="user-info">
                 <img src="https://cdn-icons-png.flaticon.com/512/552/552721.png" alt="" />
-                <h3><%= ac.getUsername()%></h3>
+                <h3><%= ac.getUsername().split("#")[1] %></h3>
             </div>
 
             <div class="sidebar">
@@ -63,7 +63,7 @@
                         <li class="list">
                             <a href="SO_Dashboard.jsp" class="nav-link">
                                 <i class="bx bxs-spreadsheet icon"></i>
-                                <span class="link">PROFILE</span>
+                                <span class="link">DASHBOARD</span>
                             </a>
                         </li>
                         <li class="list">

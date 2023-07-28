@@ -52,13 +52,13 @@
                                 </span>
                             </div>
                             <div class="login-form-input">
-                                <input class="input" type="tel" name="phone" placeholder="Phone number*" required>
+                                <input class="input" type="tel" name="phone" pattern="(84|0[3|5|7|8|9])+([0-9]{8})\b" minlength="10" maxlength="10" placeholder="Phone number*" required>
                                 <span class="symbol-input">
                                     <i class="fa-solid fa-phone"></i>
                                 </span>
                             </div>
                             <div class="login-form-input">
-                                <input class="input" type="text" name="address" placeholder="Address*" required>
+                                <input class="input" type="text" name="address" placeholder="Address">
                                 <span class="symbol-input">
                                     <i class="fa-solid fa-location-dot"></i>
                                 </span>

@@ -73,10 +73,6 @@
         <servlet-class>com.team1.BirdPee.Servlet.OrderSort</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>SendOrderMail</servlet-name>
-        <servlet-class>com.team1.BirdPee.Servlet.SendOrderMail</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>CancelOrder</servlet-name>
         <servlet-class>com.team1.BirdPee.Servlet.CancelOrder</servlet-class>
     </servlet>
@@ -135,6 +131,70 @@
     <servlet>
         <servlet-name>SOReplyFeedback</servlet-name>
         <servlet-class>com.team1.BirdPee.Servlet.SOReplyFeedback</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SendIDToShopProfile</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.SendIDToShopProfile</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ProductShopSort</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.ProductShopSort</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SendReport</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.SendReport</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>FollowShop</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.FollowShop</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UnfollowShop</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.UnfollowShop</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ADBanShop</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.ADBanShop</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ADSearch</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.ADSearch</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ADSearchCS</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.ADSearchCS</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ADBanCus</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.ADBanCus</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ADSearchShop</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.ADSearchShop</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ADCreateSOAccount</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.ADCreateSOAccount</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SOFirstCreate</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.SOFirstCreate</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SOMailSend</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.SOMailSend</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SendOrderMail</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.SendOrderMail</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SendOTPRegister</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.SendOTPRegister</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CheckOTPRegister</servlet-name>
+        <servlet-class>com.team1.BirdPee.Servlet.CheckOTPRegister</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>BirdPee</servlet-name>
@@ -209,10 +269,6 @@
         <url-pattern>/OrderSort</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>SendOrderMail</servlet-name>
-        <url-pattern>/SendOrderMail</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>CancelOrder</servlet-name>
         <url-pattern>/CancelOrder</url-pattern>
     </servlet-mapping>
@@ -271,6 +327,70 @@
     <servlet-mapping>
         <servlet-name>SOReplyFeedback</servlet-name>
         <url-pattern>/SOReplyFeedback</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SendIDToShopProfile</servlet-name>
+        <url-pattern>/SendIDToShopProfile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProductShopSort</servlet-name>
+        <url-pattern>/ProductShopSort</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SendReport</servlet-name>
+        <url-pattern>/SendReport</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FollowShop</servlet-name>
+        <url-pattern>/FollowShop</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UnfollowShop</servlet-name>
+        <url-pattern>/UnfollowShop</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ADBanShop</servlet-name>
+        <url-pattern>/ADBanShop</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ADSearch</servlet-name>
+        <url-pattern>/ADSearch</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ADSearchCS</servlet-name>
+        <url-pattern>/ADSearchCS</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ADBanCus</servlet-name>
+        <url-pattern>/ADBanCus</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ADSearchShop</servlet-name>
+        <url-pattern>/ADSearchShop</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ADCreateSOAccount</servlet-name>
+        <url-pattern>/ADCreateSOAccount</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SOFirstCreate</servlet-name>
+        <url-pattern>/SOFirstCreate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SOMailSend</servlet-name>
+        <url-pattern>/SOMailSend</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SendOrderMail</servlet-name>
+        <url-pattern>/SendOrderMail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SendOTPRegister</servlet-name>
+        <url-pattern>/SendOTPRegister</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CheckOTPRegister</servlet-name>
+        <url-pattern>/CheckOTPRegister</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

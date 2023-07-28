@@ -61,7 +61,7 @@ new Chart(ctx2, {
     ],
     datasets: [
       {
-        label: "Sold Product",
+        label: "Sold Quantity",
         data: [
             HPBCdata_1.value, 
             HPBCdata_2.value, 

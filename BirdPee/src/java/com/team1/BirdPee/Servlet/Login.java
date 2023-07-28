@@ -34,34 +34,49 @@ public class Login extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            HttpSession sesson = request.getSession();
+            HttpSession session = request.getSession();
             String eou = request.getParameter("email");//eou first time is email
             String pass = request.getParameter("pass");
             String destination = "";
             Account ac = new Account();
             String e[] = eou.split("@");
 
-            if (e.length == 2) {//is email
+            if (e.length == 2 && !e[0].equalsIgnoreCase("SO")) {//is email
                 ac = BirdPeeDAO.ACCOUNT_checkExistedCustomerByEmailPass(eou, pass);
                 if (ac.getUsername() != null) {
-                    destination = "Homepage.jsp";
-                    sesson.setAttribute("user", ac);
-                } else{// no account
-                     request.setAttribute("errorMsg", "Incorrect email or password");
+                    if (ac.getStatus() == 1) {
+                        destination = "Homepage.jsp";
+                        session.setAttribute("user", ac);
+                    } else {
+                        request.setAttribute("errorMsg", "This account has been banned");
+                        destination = "Login.jsp";
+                    }
+                } else {// no account
+                    request.setAttribute("errorMsg", "Incorrect email or password");
                     destination = "Login.jsp";
                 }
             } else {//is not email -> username
                 ac = BirdPeeDAO.ACCOUNT_checkExistedAccountByNamePass(eou, pass);
                 if (ac.getRole() != null) {//have account
-                    switch (ac.getRole()) {
-                        case "SO":
-                            destination = "SO_Dashboard.jsp";
-                            break;
-                        case "AD":
-                            destination = "TestTrue.jsp";
-                            break;
+                    if (ac.getStatus() == 1) {
+                        switch (ac.getRole()) {
+                            case "SO":
+                                if(ac.getPassword().equalsIgnoreCase("12345")){
+                                    session.setAttribute("newso", "new");
+                                    destination = "Login.jsp";
+                                }else{
+                                    destination = "SO_Dashboard.jsp";
+                                }        
+                                break;
+                            case "AD":
+                                destination = "AD_Dashboard.jsp";
+                                break;
+                        }
+                        session.setAttribute("user", ac);
+                    } else {
+                        request.setAttribute("errorMsg", "This shop's account has been banned");
+                        destination = "Login.jsp";
                     }
-                    sesson.setAttribute("user", ac);
                 } else {//no account
                     request.setAttribute("errorMsg", "Incorrect email or password");
                     destination = "Login.jsp";
