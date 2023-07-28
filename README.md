@@ -1,9 +1,9 @@
 # Welcome to BirdPee Repository
 ### You will find in this repository
 
--  [Reason for establishment](https://github.com/KenTheWhale/BirdPeeProject/edit/main/README.md#stories-before-we-arrived)
--  [BirdPee - a great assistant](https://github.com/KenTheWhale/BirdPeeProject/edit/main/README.md#birdpee-has-landed)
--  [The beauty of BirdPee](https://github.com/KenTheWhale/BirdPeeProject/edit/main/README.md#peacock-birdpee-shows-off)
+-  [Reason for establishment](https://github.com/KenTheWhale/BirdPeeProject/tree/main#parrot-stories-before-we-arrived)
+-  [BirdPee - a great assistant](https://github.com/KenTheWhale/BirdPeeProject/tree/main#eagle-birdpee-has-landed)
+-  [The beauty of BirdPee](https://github.com/KenTheWhale/BirdPeeProject/tree/main#peacock-birdpee-shows-off)
 
 ## :parrot: Stories before we arrived
 
